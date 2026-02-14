@@ -1,12 +1,65 @@
+"use client";
+
+import { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 export default function Footer() {
+  const footerRef = useRef<HTMLElement>(null);
+  const linksRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!footerRef.current) return;
+
+    const footerAnim = gsap.from(footerRef.current, {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: footerRef.current,
+        start: "top 92%",
+        once: true,
+      },
+    });
+
+    let linksAnim: gsap.core.Tween | undefined;
+    if (linksRef.current) {
+      linksAnim = gsap.from(linksRef.current.children, {
+        opacity: 0,
+        y: 10,
+        stagger: 0.06,
+        duration: 0.4,
+        delay: 0.2,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: footerRef.current,
+          start: "top 92%",
+          once: true,
+        },
+      });
+    }
+
+    return () => {
+      footerAnim.scrollTrigger?.kill();
+      footerAnim.kill();
+      linksAnim?.scrollTrigger?.kill();
+      linksAnim?.kill();
+    };
+  }, []);
+
   return (
-    <footer className="border-t border-neutral-200 px-4 py-6 md:px-6 md:py-8">
+    <footer ref={footerRef} className="border-t border-neutral-200 px-4 py-6 md:px-6 md:py-8">
       {/* Links row */}
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <span className="text-sm font-semibold text-neutral-800">
           ModooGoods
         </span>
-        <nav className="flex flex-wrap gap-3 text-[11px] text-neutral-500 md:gap-4 md:text-xs">
+        <nav ref={linksRef} className="flex flex-wrap gap-3 text-[11px] text-neutral-500 md:gap-4 md:text-xs">
           <a href="#" className="hover:text-neutral-800">FAQ</a>
           <a href="#" className="hover:text-neutral-800">CONTACT</a>
           <a href="#" className="hover:text-neutral-800">이용약관</a>

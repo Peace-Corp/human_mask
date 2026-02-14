@@ -3,14 +3,26 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
+import gsap from "gsap";
 import "swiper/css";
 
 const PRODUCT_COUNT = 6;
 
 export default function ProductCarousel() {
+  const sectionRef = useScrollReveal<HTMLElement>({ y: 40, duration: 0.7 });
+  const titleRef = useScrollReveal<HTMLHeadingElement>({
+    y: 20,
+    duration: 0.5,
+    delay: 0.15,
+  });
+
   return (
-    <section className="py-6 md:py-10">
-      <h2 className="mb-4 text-center font-bmk text-base font-bold md:mb-6 md:text-lg">
+    <section ref={sectionRef} className="py-6 md:py-10">
+      <h2
+        ref={titleRef}
+        className="mb-4 text-center font-bmk text-base font-bold md:mb-6 md:text-lg"
+      >
         제품 구성
       </h2>
 
@@ -42,8 +54,24 @@ export default function ProductCarousel() {
             {Array.from({ length: PRODUCT_COUNT }).map((_, i) => (
               <SwiperSlide key={i}>
                 <button
-                  className="w-full rounded bg-gray-100 transition-shadow hover:shadow-md"
+                  className="w-full rounded bg-gray-100"
                   style={{ aspectRatio: "0.7 / 1" }}
+                  onMouseEnter={(e) => {
+                    gsap.to(e.currentTarget, {
+                      scale: 1.03,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      duration: 0.25,
+                      ease: "power2.out",
+                    });
+                  }}
+                  onMouseLeave={(e) => {
+                    gsap.to(e.currentTarget, {
+                      scale: 1,
+                      boxShadow: "0 0 0 rgba(0,0,0,0)",
+                      duration: 0.25,
+                      ease: "power2.out",
+                    });
+                  }}
                 >
                   <span className="text-[10px] text-neutral-400">
                     상품 {i + 1}

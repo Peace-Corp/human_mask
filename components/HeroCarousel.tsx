@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useCallback, type ReactNode } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import gsap from "gsap";
 import "swiper/css";
 
 const SLIDES = [
@@ -22,13 +23,51 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ header }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
+  const handleSlideChange = useCallback(
+    (swiper: { realIndex: number }) => {
+      const newIndex = swiper.realIndex;
+      const oldIndex = current;
+      setCurrent(newIndex);
+
+      // Animate background color
+      if (bgRef.current) {
+        gsap.to(bgRef.current, {
+          backgroundColor: SLIDES[newIndex].bgColor,
+          duration: 0.6,
+          ease: "power2.inOut",
+        });
+      }
+
+      // Animate dots: shrink old, bounce new
+      if (dotRefs.current[oldIndex]) {
+        gsap.to(dotRefs.current[oldIndex], { scale: 1, duration: 0.3 });
+      }
+      if (dotRefs.current[newIndex]) {
+        gsap.fromTo(
+          dotRefs.current[newIndex],
+          { scale: 1 },
+          { scale: 1.4, duration: 0.4, ease: "elastic.out(1, 0.5)" }
+        );
+        gsap.to(dotRefs.current[newIndex], {
+          scale: 1,
+          duration: 0.3,
+          delay: 0.4,
+        });
+      }
+    },
+    [current]
+  );
 
   return (
     <section className="relative w-full">
-      {/* Background — fills width, ~60% height, color transitions with slide */}
+      {/* Background — fills width, ~60% height, color animated via GSAP */}
       <div
-        className="absolute inset-x-0 top-0 h-[60%] transition-colors duration-500 ease-out"
-        style={{ backgroundColor: SLIDES[current].bgColor }}
+        ref={bgRef}
+        className="absolute inset-x-0 top-0 h-[60%]"
+        style={{ backgroundColor: SLIDES[0].bgColor }}
       />
 
       <div className="relative">
@@ -40,13 +79,13 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
             modules={[Navigation, Pagination]}
             slidesPerView={1.8}
             centeredSlides
-            spaceBetween={16}
+            spaceBetween={32}
             loop
             navigation={{
               prevEl: ".hero-prev",
               nextEl: ".hero-next",
             }}
-            onSlideChange={(swiper) => setCurrent(swiper.realIndex)}
+            onSlideChange={handleSlideChange}
           >
             {SLIDES.map((slide, i) => (
               <SwiperSlide key={i}>
@@ -62,7 +101,7 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
             ))}
           </Swiper>
 
-          {/* Arrow buttons — positioned at the edge between active and adjacent slides */}
+          {/* Arrow buttons */}
           <button
             className="hero-prev absolute left-[22%] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
             aria-label="이전 슬라이드"
@@ -82,6 +121,7 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
           {SLIDES.map((_, i) => (
             <span
               key={i}
+              ref={(el) => { dotRefs.current[i] = el; }}
               className={`h-2 w-2 rounded-full transition-colors ${
                 i === current ? "bg-neutral-800" : "bg-neutral-300"
               }`}

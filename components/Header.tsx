@@ -1,8 +1,27 @@
+"use client";
+
+import { useRef, useEffect } from "react";
 import { User, ShoppingCart } from "lucide-react";
+import gsap from "gsap";
 
 export default function Header() {
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!headerRef.current) return;
+    gsap.from(headerRef.current, {
+      opacity: 0,
+      y: -10,
+      duration: 0.4,
+      ease: "power2.out",
+    });
+  }, []);
+
   return (
-    <header className="relative z-10 flex items-center justify-between px-4 py-2.5 mix-blend-difference md:px-6 md:py-3">
+    <header
+      ref={headerRef}
+      className="relative z-10 flex items-center justify-between px-4 py-2.5 mix-blend-difference md:px-6 md:py-3"
+    >
       <div className="flex items-center gap-3 text-xs tracking-wide text-white md:text-sm">
         <a href="#" className="font-bmk hover:opacity-70">
           CONTACT

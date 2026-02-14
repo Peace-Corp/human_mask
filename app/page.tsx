@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import ProductCarousel from "@/components/ProductCarousel";
 import Footer from "@/components/Footer";
+import LogoSection from "@/components/LogoSection";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,13 +22,7 @@ export default function Home() {
           <ProductCarousel />
 
           {/* Logo Section */}
-          <section className="flex flex-1 items-center justify-center px-8 py-16 md:py-24">
-            <div className="flex h-48 w-64 items-center justify-center sm:h-56 sm:w-80 md:h-72 md:w-96">
-              <span className="font-bmk text-6xl text-neutral-800 sm:text-7xl md:text-8xl">
-                사람의 탈
-              </span>
-            </div>
-          </section>
+          <LogoSection />
         </main>
 
         <Footer />
