@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, type ReactNode } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import gsap from "gsap";
 import "swiper/css";
@@ -76,11 +76,12 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
         {/* Swiper carousel */}
         <div className="relative overflow-hidden">
           <Swiper
-            modules={[Navigation, Pagination]}
+            modules={[Navigation, Pagination, Autoplay]}
             slidesPerView={1.8}
             centeredSlides
             spaceBetween={32}
             loop
+            autoplay={{ delay: 4000, disableOnInteraction: false }}
             navigation={{
               prevEl: ".hero-prev",
               nextEl: ".hero-next",

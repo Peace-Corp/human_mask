@@ -42,6 +42,7 @@ export default function ProductCarousel() {
             slidesPerView={3}
             spaceBetween={12}
             loop
+            grabCursor
             navigation={{
               prevEl: ".product-prev",
               nextEl: ".product-next",
@@ -53,8 +54,8 @@ export default function ProductCarousel() {
           >
             {Array.from({ length: PRODUCT_COUNT }).map((_, i) => (
               <SwiperSlide key={i}>
-                <button
-                  className="w-full rounded bg-gray-100"
+                <div
+                  className="w-full cursor-pointer rounded bg-gray-100"
                   style={{ aspectRatio: "0.7 / 1" }}
                   onMouseEnter={(e) => {
                     gsap.to(e.currentTarget, {
@@ -76,7 +77,7 @@ export default function ProductCarousel() {
                   <span className="text-[10px] text-neutral-400">
                     상품 {i + 1}
                   </span>
-                </button>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>
