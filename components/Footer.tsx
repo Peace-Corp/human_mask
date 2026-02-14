@@ -15,41 +15,13 @@ export default function Footer() {
       </div>
 
       {/* Business Info */}
-      <div className="mt-6 grid grid-cols-1 gap-6 text-[11px] leading-relaxed text-neutral-500 sm:grid-cols-3 md:mt-8 md:text-xs">
-        {/* 사업자 정보 */}
-        <div>
-          <h3 className="mb-2 text-xs font-bold text-neutral-800 md:text-sm">
-            사업자 정보
-          </h3>
-          <p>상호명: 피스코프</p>
-          <p>주소지: 서울특별시 마포구 세터산 4길 2, b102호</p>
-          <p>전화번호: 010-2087-0621</p>
-          <p>사업자등록번호: 118-08-15095</p>
-          <p>대표자 이름: 김현준</p>
-          <p>개인정보 책임자: 김현준</p>
-          <p>통신판매업신고번호: 2021-서울마포-1399</p>
-        </div>
-
-        {/* BANK INFO */}
-        <div>
-          <h3 className="mb-2 text-xs font-bold text-neutral-800 md:text-sm">
-            BANK INFO
-          </h3>
-          <p>우리은행</p>
-          <p>1005904144208</p>
-          <p>예금주: 피스코프</p>
-        </div>
-
-        {/* 고객 지원 */}
-        <div>
-          <h3 className="mb-2 text-xs font-bold text-neutral-800 md:text-sm">
-            고객 지원
-          </h3>
-          <p>운영시간: 평일 10:00 ~ 18:00</p>
-          <p>점심시간: 12:00 ~ 13:00</p>
-          <p>주말/공휴일 휴무</p>
-        </div>
-      </div>
+      <p className="mt-4 text-center text-[10px] leading-relaxed text-neutral-400 md:mt-6 md:text-[11px]">
+        <span className="font-bold text-neutral-800">상호명: 피스코프</span> | 대표자: 김현준 | 개인정보 책임자: 김현준<br />
+        주소지: 서울특별시 마포구 세터산 4길 2, b102호 | <span className="font-bold text-neutral-800">전화번호: 010-2087-0621</span><br />
+        <span className="font-bold text-neutral-800">사업자등록번호: 118-08-15095</span> | 통신판매업신고번호: 2021-서울마포-1399<br />
+        <span className="font-bold text-neutral-800">우리은행 1005904144208</span> (예금주: 피스코프)<br />
+        <span className="font-bold text-neutral-800">운영시간: 평일 10:00 ~ 18:00</span> (점심 12:00 ~ 13:00) | 주말/공휴일 휴무
+      </p>
     </footer>
   );
 }
