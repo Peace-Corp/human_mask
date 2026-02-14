@@ -11,16 +11,8 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* Hero area — full width with partial yellow background */}
-      <div className="relative w-full">
-        {/* Yellow background — fills width, ~60% of the hero height */}
-        <div className="absolute inset-x-0 top-0 h-[60%] bg-brand-yellow" />
-
-        <div className="relative">
-          <Header />
-          <HeroCarousel />
-        </div>
-      </div>
+      {/* Hero area — full width, background color driven by active slide */}
+      <HeroCarousel header={<Header />} />
 
       {/* Content area — constrained width */}
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
