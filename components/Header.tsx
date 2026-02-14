@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 import { User, ShoppingCart } from "lucide-react";
 import gsap from "gsap";
 
@@ -20,20 +21,20 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="relative z-10 flex items-center justify-between px-4 py-2.5 mix-blend-difference md:px-6 md:py-3"
+      className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-2.5 mix-blend-difference md:px-6 md:py-3"
     >
       <div className="flex items-center gap-3 text-xs tracking-wide text-white md:text-sm">
-        <a href="#" className="font-bmk hover:opacity-70">
+        <Link href="/contact" className="font-bmk hover:opacity-70">
           CONTACT
-        </a>
-        <a href="#" className="font-bmk hover:opacity-70">
+        </Link>
+        <Link href="/faq" className="font-bmk hover:opacity-70">
           FAQ
-        </a>
+        </Link>
       </div>
 
-      <h1 className="absolute left-1/2 -translate-x-1/2 font-bmk text-base font-bold text-white md:text-lg">
+      <Link href="/" className="absolute left-1/2 -translate-x-1/2 font-bmk text-base font-bold text-white md:text-lg">
         사람의 탈
-      </h1>
+      </Link>
 
       <div className="flex items-center gap-2 text-white">
         <button aria-label="계정" className="hover:opacity-70">

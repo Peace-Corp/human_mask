@@ -34,24 +34,28 @@ export function useScrollReveal<T extends HTMLElement>(
     if (!ref.current) return;
 
     const targets = stagger ? ref.current.children : ref.current;
-
-    const anim = gsap.from(targets, {
-      y,
-      opacity: 0,
-      duration,
-      delay,
-      stagger: stagger || undefined,
-      ease,
-      scrollTrigger: {
-        trigger: ref.current,
-        start,
-        once: true,
-      },
+    const ctx = gsap.context(() => {
+      gsap.from(targets, {
+        y,
+        opacity: 0,
+        duration,
+        delay,
+        stagger: stagger || undefined,
+        ease,
+        scrollTrigger: {
+          trigger: ref.current,
+          start,
+          once: true,
+          invalidateOnRefresh: true,
+        },
+      });
     });
 
+    const tid = setTimeout(() => ScrollTrigger.refresh(), 100);
+
     return () => {
-      anim.scrollTrigger?.kill();
-      anim.kill();
+      clearTimeout(tid);
+      ctx.revert();
     };
   }, [y, duration, delay, stagger, start, ease]);
 

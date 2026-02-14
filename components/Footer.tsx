@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -15,40 +16,43 @@ export default function Footer() {
   useEffect(() => {
     if (!footerRef.current) return;
 
-    const footerAnim = gsap.from(footerRef.current, {
-      opacity: 0,
-      y: 20,
-      duration: 0.5,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: footerRef.current,
-        start: "top 92%",
-        once: true,
-      },
-    });
-
-    let linksAnim: gsap.core.Tween | undefined;
-    if (linksRef.current) {
-      linksAnim = gsap.from(linksRef.current.children, {
+    const ctx = gsap.context(() => {
+      gsap.from(footerRef.current!, {
         opacity: 0,
-        y: 10,
-        stagger: 0.06,
-        duration: 0.4,
-        delay: 0.2,
+        y: 20,
+        duration: 0.5,
         ease: "power2.out",
         scrollTrigger: {
           trigger: footerRef.current,
           start: "top 92%",
           once: true,
+          invalidateOnRefresh: true,
         },
       });
-    }
+
+      if (linksRef.current) {
+        gsap.from(linksRef.current.children, {
+          opacity: 0,
+          y: 10,
+          stagger: 0.06,
+          duration: 0.4,
+          delay: 0.2,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: "top 92%",
+            once: true,
+            invalidateOnRefresh: true,
+          },
+        });
+      }
+    });
+
+    const tid = setTimeout(() => ScrollTrigger.refresh(), 100);
 
     return () => {
-      footerAnim.scrollTrigger?.kill();
-      footerAnim.kill();
-      linksAnim?.scrollTrigger?.kill();
-      linksAnim?.kill();
+      clearTimeout(tid);
+      ctx.revert();
     };
   }, []);
 
@@ -60,8 +64,8 @@ export default function Footer() {
           ModooGoods
         </span>
         <nav ref={linksRef} className="flex flex-wrap gap-3 text-[11px] text-neutral-500 md:gap-4 md:text-xs">
-          <a href="#" className="hover:text-neutral-800">FAQ</a>
-          <a href="#" className="hover:text-neutral-800">CONTACT</a>
+          <Link href="/faq" className="hover:text-neutral-800">FAQ</Link>
+          <Link href="/contact" className="hover:text-neutral-800">CONTACT</Link>
           <a href="#" className="hover:text-neutral-800">이용약관</a>
           <a href="#" className="hover:text-neutral-800">개인정보처리</a>
         </nav>

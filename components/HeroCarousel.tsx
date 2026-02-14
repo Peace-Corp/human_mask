@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, type ReactNode } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -17,11 +17,7 @@ const SLIDES = [
   { label: "배너 이미지 7", bgColor: "#6B4DE2" },
 ];
 
-interface HeroCarouselProps {
-  header?: ReactNode;
-}
-
-export default function HeroCarousel({ header }: HeroCarouselProps) {
+export default function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const bgRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -62,7 +58,7 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
   );
 
   return (
-    <section className="relative w-full">
+    <section className="relative w-full pt-14">
       {/* Background — fills width, ~60% height, color animated via GSAP */}
       <div
         ref={bgRef}
@@ -71,8 +67,6 @@ export default function HeroCarousel({ header }: HeroCarouselProps) {
       />
 
       <div className="relative">
-        {header}
-
         {/* Swiper carousel */}
         <div className="relative overflow-hidden">
           <Swiper

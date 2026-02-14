@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import ProductCarousel from "@/components/ProductCarousel";
 import Footer from "@/components/Footer";
@@ -13,7 +12,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* Hero area — full width, background color driven by active slide */}
-      <HeroCarousel header={<Header />} />
+      <HeroCarousel />
 
       {/* Content area — constrained width */}
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">

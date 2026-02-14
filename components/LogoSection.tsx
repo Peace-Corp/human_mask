@@ -14,34 +14,39 @@ export default function LogoSection() {
   useEffect(() => {
     if (!textRef.current) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: textRef.current,
-        start: "top 85%",
-        once: true,
-      },
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: textRef.current,
+          start: "top 85%",
+          once: true,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      // Entrance: scale up and fade in
+      tl.from(textRef.current!, {
+        scale: 0.8,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+
+      // Continuous gentle float
+      tl.to(textRef.current!, {
+        y: -4,
+        duration: 3,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
     });
 
-    // Entrance: scale up and fade in
-    tl.from(textRef.current, {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.8,
-      ease: "power3.out",
-    });
-
-    // Continuous gentle float
-    tl.to(textRef.current, {
-      y: -4,
-      duration: 3,
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-    });
+    const tid = setTimeout(() => ScrollTrigger.refresh(), 100);
 
     return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
+      clearTimeout(tid);
+      ctx.revert();
     };
   }, []);
 
