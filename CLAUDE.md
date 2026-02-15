@@ -7,7 +7,7 @@ This project is a simple shopping mall website for an ip named '사람의 탈'. 
 - Tailwindcss for styling
 
 ### Rules
-- The general font size should be small
+- The general font size and paddings should be small
 - Every UI change should take into count of responsive design
 - Mobile UI should generally have smaller paddings, and smaller font sizes
 - Any util function that may be used in multiple files should generate a separate file in a utils folder for maintainability

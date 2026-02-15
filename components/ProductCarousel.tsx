@@ -3,6 +3,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import gsap from "gsap";
 import "swiper/css";
@@ -54,30 +55,32 @@ export default function ProductCarousel() {
           >
             {Array.from({ length: PRODUCT_COUNT }).map((_, i) => (
               <SwiperSlide key={i}>
-                <div
-                  className="w-full cursor-pointer rounded bg-gray-100"
-                  style={{ aspectRatio: "0.7 / 1" }}
-                  onMouseEnter={(e) => {
-                    gsap.to(e.currentTarget, {
-                      scale: 1.03,
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                      duration: 0.25,
-                      ease: "power2.out",
-                    });
-                  }}
-                  onMouseLeave={(e) => {
-                    gsap.to(e.currentTarget, {
-                      scale: 1,
-                      boxShadow: "0 0 0 rgba(0,0,0,0)",
-                      duration: 0.25,
-                      ease: "power2.out",
-                    });
-                  }}
-                >
-                  <span className="text-[10px] text-neutral-400">
-                    상품 {i + 1}
-                  </span>
-                </div>
+                <Link href={`/product/${i + 1}`}>
+                  <div
+                    className="w-full cursor-pointer rounded bg-gray-100"
+                    style={{ aspectRatio: "0.7 / 1" }}
+                    onMouseEnter={(e) => {
+                      gsap.to(e.currentTarget, {
+                        scale: 1.03,
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        duration: 0.25,
+                        ease: "power2.out",
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      gsap.to(e.currentTarget, {
+                        scale: 1,
+                        boxShadow: "0 0 0 rgba(0,0,0,0)",
+                        duration: 0.25,
+                        ease: "power2.out",
+                      });
+                    }}
+                  >
+                    <span className="text-[10px] text-neutral-400">
+                      상품 {i + 1}
+                    </span>
+                  </div>
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>
