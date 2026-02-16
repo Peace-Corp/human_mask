@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import Footer from "@/components/Footer";
+import { formatPrice } from "@/utils/formatPrice";
 
 interface SizeOption {
   label: string;
@@ -22,10 +23,6 @@ const MOCK_PRODUCT = {
   image: "/placeholder-product.png",
   detailImage: "/placeholder-detail.png",
 };
-
-function formatPrice(amount: number) {
-  return `₩ ${amount.toLocaleString()}원`;
-}
 
 export default function ProductDetailPage() {
   const params = useParams();

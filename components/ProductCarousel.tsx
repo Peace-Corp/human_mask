@@ -3,12 +3,18 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import gsap from "gsap";
+import ProductCard from "@/components/ProductCard";
 import "swiper/css";
 
-const PRODUCT_COUNT = 6;
+const MOCK_PRODUCTS = [
+  { id: 1, name: "사람의 탈 티셔츠 (블랙)", price: 30000 },
+  { id: 2, name: "사람의 탈 티셔츠 (화이트)", price: 30000 },
+  { id: 3, name: "사람의 탈 후드 (블랙)", price: 45000 },
+  { id: 4, name: "사람의 탈 모자", price: 20000 },
+  { id: 5, name: "사람의 탈 에코백", price: 15000 },
+  { id: 6, name: "사람의 탈 스티커 세트", price: 5000 },
+];
 
 export default function ProductCarousel() {
   const sectionRef = useScrollReveal<HTMLElement>({ y: 40, duration: 0.7 });
@@ -53,34 +59,13 @@ export default function ProductCarousel() {
               768: { slidesPerView: 5, spaceBetween: 16 },
             }}
           >
-            {Array.from({ length: PRODUCT_COUNT }).map((_, i) => (
-              <SwiperSlide key={i}>
-                <Link href={`/product/${i + 1}`}>
-                  <div
-                    className="w-full cursor-pointer rounded bg-gray-100"
-                    style={{ aspectRatio: "0.7 / 1" }}
-                    onMouseEnter={(e) => {
-                      gsap.to(e.currentTarget, {
-                        scale: 1.03,
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                        duration: 0.25,
-                        ease: "power2.out",
-                      });
-                    }}
-                    onMouseLeave={(e) => {
-                      gsap.to(e.currentTarget, {
-                        scale: 1,
-                        boxShadow: "0 0 0 rgba(0,0,0,0)",
-                        duration: 0.25,
-                        ease: "power2.out",
-                      });
-                    }}
-                  >
-                    <span className="text-[10px] text-neutral-400">
-                      상품 {i + 1}
-                    </span>
-                  </div>
-                </Link>
+            {MOCK_PRODUCTS.map((product) => (
+              <SwiperSlide key={product.id}>
+                <ProductCard
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                />
               </SwiperSlide>
             ))}
           </Swiper>
