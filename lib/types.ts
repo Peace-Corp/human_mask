@@ -38,6 +38,24 @@ export interface CartItem {
   image: string;
 }
 
+export interface ShippingInfo {
+  name: string;
+  phone: string;
+  email: string;
+  shippingType: "domestic" | "international";
+  // Domestic (JUSO API)
+  zonecode?: string;
+  roadAddress?: string;
+  detailAddress?: string;
+  // International
+  country?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+}
+
 export interface BrandHeroBanner {
   id: string;
   brand_id: string;

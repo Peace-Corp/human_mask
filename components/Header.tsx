@@ -2,15 +2,20 @@
 
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import gsap from "gsap";
 import { getCartCount } from "@/utils/cart";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+
+  const showSolid = !isHome || scrolled;
 
   useEffect(() => {
     if (!headerRef.current) return;
@@ -46,14 +51,14 @@ export default function Header() {
       <header
         ref={headerRef}
         className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-2.5 transition-all duration-300 md:px-6 md:py-3 ${
-          scrolled
+          showSolid
             ? "bg-white/10 backdrop-blur-md shadow-sm"
             : "mix-blend-difference"
         }`}
       >
         {/* Desktop: nav links | Mobile: brand name */}
         <div
-          className={`hidden items-center gap-3 text-xs tracking-wide md:flex md:text-sm ${scrolled ? "text-black" : "text-white"}`}
+          className={`hidden items-center gap-3 text-xs tracking-wide md:flex md:text-sm ${showSolid ? "text-black" : "text-white"}`}
         >
           <Link href="/contact" className="font-bmk hover:opacity-70">
             CONTACT
@@ -65,14 +70,14 @@ export default function Header() {
 
         <Link
           href="/"
-          className={`font-bmk text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg ${scrolled ? "text-black" : "text-white"}`}
+          className={`font-bmk text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg ${showSolid ? "text-black" : "text-white"}`}
         >
           사람의 탈
         </Link>
 
         {/* Desktop: icons | Mobile: hamburger */}
         <div
-          className={`hidden items-center gap-2 md:flex ${scrolled ? "text-black" : "text-white"}`}
+          className={`hidden items-center gap-2 md:flex ${showSolid ? "text-black" : "text-white"}`}
         >
           <Link href="/cart" aria-label="장바구니" className="relative hover:opacity-70">
             <ShoppingCart className="h-5 w-5" />
@@ -86,7 +91,7 @@ export default function Header() {
 
         <button
           aria-label="메뉴"
-          className={`md:hidden ${scrolled ? "text-black" : "text-white"}`}
+          className={`md:hidden ${showSolid ? "text-black" : "text-white"}`}
           onClick={() => setSidebarOpen(true)}
         >
           <Menu className="h-5 w-5" />

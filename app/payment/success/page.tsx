@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { clearCart } from "@/utils/cart";
+import { finalizeOrder } from "@/lib/orders";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -16,9 +17,7 @@ function PaymentSuccessContent() {
   const paymentKey = searchParams.get("paymentKey");
   const orderId = searchParams.get("orderId");
   const amount = searchParams.get("amount");
-  const expectedAmount = typeof window !== "undefined"
-    ? localStorage.getItem("expected_payment_amount")
-    : null;
+  const expectedAmount = searchParams.get("expectedAmount");
   const isValid = amount && expectedAmount
     ? Number(amount) === Number(expectedAmount)
     : false;
@@ -45,12 +44,11 @@ function PaymentSuccessContent() {
       //   }),
       // });
 
-      // Simulating backend confirmation for test mode
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Update order status in Supabase
+      await finalizeOrder(orderId!, paymentKey || null);
 
-      // Clear cart and expected amount after successful payment
+      // Clear cart after successful payment
       clearCart();
-      localStorage.removeItem("expected_payment_amount");
 
       setConfirmResult({
         success: true,
