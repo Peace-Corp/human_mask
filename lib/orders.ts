@@ -78,3 +78,57 @@ export async function finalizeOrder(
 
   if (error) throw error;
 }
+
+export interface OrderWithItems {
+  id: string;
+  total: number;
+  status: string;
+  payment_method: string;
+  delivery_method: string;
+  customer_name: string | null;
+  customer_email: string | null;
+  order_name: string | null;
+  created_at: string;
+  items: {
+    id: string;
+    size: string | null;
+    quantity: number;
+    price_at_time: number;
+    product: { name: string; images: string[] } | null;
+  }[];
+}
+
+export async function getOrderWithItems(
+  orderId: string
+): Promise<OrderWithItems | null> {
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select(
+      `
+      id, total, status, payment_method, delivery_method,
+      customer_name, customer_email, order_name, created_at
+    `
+    )
+    .eq("id", orderId)
+    .single();
+
+  if (error || !order) return null;
+
+  const { data: items } = await supabase
+    .from("order_items")
+    .select(
+      `
+      id, size, quantity, price_at_time,
+      product:products(name, images)
+    `
+    )
+    .eq("order_id", orderId);
+
+  return {
+    ...order,
+    items: (items || []).map((item) => ({
+      ...item,
+      product: Array.isArray(item.product) ? item.product[0] : item.product,
+    })),
+  };
+}
