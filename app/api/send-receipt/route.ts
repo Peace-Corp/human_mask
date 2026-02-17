@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
                 Name: order.customer_name || order.customer_email,
               },
             ],
-            Subject: `주문 확인 - ${order.id}`,
+            Subject: `사람의 탈 굿즈 - 주문 확인`,
             HTMLPart: html,
           },
         ],
