@@ -89,13 +89,22 @@ export default function Header() {
           </Link>
         </div>
 
-        <button
-          aria-label="메뉴"
-          className={`md:hidden ${showSolid ? "text-black" : "text-white"}`}
-          onClick={() => setSidebarOpen(true)}
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+        <div className={`flex items-center gap-3 md:hidden ${showSolid ? "text-black" : "text-white"}`}>
+          <Link href="/cart" aria-label="장바구니" className="relative hover:opacity-70">
+            <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
+          <button
+            aria-label="메뉴"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       {/* Mobile sidebar overlay */}
@@ -140,21 +149,6 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="border-t border-gray-100 px-4 py-3 flex items-center gap-4">
-          <Link
-            href="/cart"
-            aria-label="장바구니"
-            className="relative hover:opacity-70"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            )}
-          </Link>
-        </div>
       </aside>
     </>
   );

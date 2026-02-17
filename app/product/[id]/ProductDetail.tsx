@@ -164,57 +164,59 @@ export default function ProductDetail({ product, variants }: ProductDetailProps)
           {/* Divider */}
           <div className="my-4 h-px bg-neutral-300" />
 
-          {/* Order summary */}
-          {selectedItems.length > 0 && (
-            <div className="mb-2 flex flex-col gap-1">
-              {selectedItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between font-bmk text-xs md:text-sm"
-                >
-                  <span>
-                    {item.size} x {item.quantity}
-                  </span>
-                  <span>{formatPrice(item.subtotal)}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* Order summary – desktop only */}
+          <div className="hidden md:block">
+            {selectedItems.length > 0 && (
+              <div className="mb-2 flex flex-col gap-1">
+                {selectedItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between font-bmk text-sm"
+                  >
+                    <span>
+                      {item.size} x {item.quantity}
+                    </span>
+                    <span>{formatPrice(item.subtotal)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
-          {/* Total */}
-          <div className="flex items-center gap-2">
-            <span className="font-bmk text-lg md:text-xl">총금액</span>
-            {totalQuantity > 0 && (
-              <span className="font-bmk text-sm md:text-base">
-                ({totalQuantity}개)
+            {/* Total */}
+            <div className="flex items-center gap-2">
+              <span className="font-bmk text-xl">총금액</span>
+              {totalQuantity > 0 && (
+                <span className="font-bmk text-base">
+                  ({totalQuantity}개)
+                </span>
+              )}
+              <span className="ml-auto font-bmk text-2xl">
+                {formatPrice(totalPrice)}
               </span>
-            )}
-            <span className="ml-auto font-bmk text-xl md:text-2xl">
-              {formatPrice(totalPrice)}
-            </span>
-          </div>
+            </div>
 
-          {/* Action buttons */}
-          <div className="mt-4 flex flex-col gap-2.5">
-            <button
-              onClick={handleBuyNow}
-              disabled={selectedItems.length === 0}
-              className="w-full rounded-full bg-black py-3 font-bmk text-xs text-white transition-opacity hover:opacity-80 disabled:opacity-40 md:text-sm"
-            >
-              바로 구매하기
-            </button>
-            <button
-              onClick={handleAddToCart}
-              disabled={selectedItems.length === 0}
-              className="w-full rounded-full bg-[#d9d9d9] py-3 font-bmk text-xs text-black transition-opacity hover:opacity-80 disabled:opacity-40 md:text-sm"
-            >
-              장바구니에 담기
-            </button>
-            {cartMessage && (
-              <p className="text-center text-xs text-green-600">
-                {cartMessage}
-              </p>
-            )}
+            {/* Action buttons */}
+            <div className="mt-4 flex flex-col gap-2.5">
+              <button
+                onClick={handleBuyNow}
+                disabled={selectedItems.length === 0}
+                className="w-full rounded-full bg-black py-3 font-bmk text-sm text-white transition-opacity hover:opacity-80 disabled:opacity-40"
+              >
+                바로 구매하기
+              </button>
+              <button
+                onClick={handleAddToCart}
+                disabled={selectedItems.length === 0}
+                className="w-full rounded-full bg-[#d9d9d9] py-3 font-bmk text-sm text-black transition-opacity hover:opacity-80 disabled:opacity-40"
+              >
+                장바구니에 담기
+              </button>
+              {cartMessage && (
+                <p className="text-center text-xs text-green-600">
+                  {cartMessage}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -234,6 +236,59 @@ export default function ProductDetail({ product, variants }: ProductDetailProps)
           </div>
         </section>
       )}
+
+      {/* Mobile fixed bottom bar */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 bg-white shadow-[0_-2px_8px_rgba(0,0,0,0.08)] transition-transform duration-300 md:hidden ${
+          totalQuantity > 0 ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          {selectedItems.length > 0 && (
+            <div className="mb-2 flex flex-col gap-0.5">
+              {selectedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between font-bmk text-xs"
+                >
+                  <span>
+                    {item.size} x {item.quantity}
+                  </span>
+                  <span>{formatPrice(item.subtotal)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <span className="font-bmk text-base">총금액</span>
+            <span className="font-bmk text-sm">({totalQuantity}개)</span>
+            <span className="ml-auto font-bmk text-lg">
+              {formatPrice(totalPrice)}
+            </span>
+          </div>
+
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 rounded-full bg-[#d9d9d9] py-2.5 font-bmk text-xs text-black transition-opacity hover:opacity-80"
+            >
+              장바구니에 담기
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="flex-1 rounded-full bg-black py-2.5 font-bmk text-xs text-white transition-opacity hover:opacity-80"
+            >
+              바로 구매하기
+            </button>
+          </div>
+          {cartMessage && (
+            <p className="mt-1 text-center text-xs text-green-600">
+              {cartMessage}
+            </p>
+          )}
+        </div>
+      </div>
     </>
   );
 }
