@@ -70,6 +70,19 @@ export async function getAllProductVariants(
   return data as ProductVariant[];
 }
 
+// --- Brand ---
+
+export async function getBrandOrderDetailImage(): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("brands")
+    .select("order_detail_image")
+    .eq("id", BRAND_ID)
+    .single();
+
+  if (error) return null;
+  return data?.order_detail_image ?? null;
+}
+
 // --- Hero Banners ---
 
 export async function getHeroBanners(): Promise<BrandHeroBanner[]> {

@@ -2,13 +2,14 @@ import HeroCarousel from "@/components/HeroCarousel";
 import ProductCarousel from "@/components/ProductCarousel";
 import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
-import LogoSection from "@/components/LogoSection";
-import { getProducts, getHeroBanners, getAllProductVariants } from "@/lib/fetchers";
+import ProductBannerSection from "@/components/ProductBannerSection";
+import { getProducts, getHeroBanners, getAllProductVariants, getBrandOrderDetailImage } from "@/lib/fetchers";
 
 export default async function Home() {
-  const [products, banners] = await Promise.all([
+  const [products, banners, orderDetailImage] = await Promise.all([
     getProducts(),
     getHeroBanners(),
+    getBrandOrderDetailImage(),
   ]);
 
   const variants = await getAllProductVariants(products.map((p) => p.id));
@@ -24,8 +25,8 @@ export default async function Home() {
           {/* Product Lineup */}
           <ProductCarousel products={products} />
 
-          {/* Logo Section */}
-          <LogoSection />
+          {/* Product Banner */}
+          {orderDetailImage && <ProductBannerSection imageUrl={orderDetailImage} />}
         </main>
 
         <Footer />
