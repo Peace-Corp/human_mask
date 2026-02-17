@@ -46,6 +46,13 @@ function PaymentSuccessContent() {
       const orderData = await getOrderWithItems(orderId!);
       setOrder(orderData);
 
+      // Fire-and-forget: send receipt email
+      fetch("/api/send-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      }).catch(() => {});
+
       setConfirmResult({
         success: true,
         message: "결제가 성공적으로 완료되었습니다.",
