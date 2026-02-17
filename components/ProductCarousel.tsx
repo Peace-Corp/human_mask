@@ -5,24 +5,22 @@ import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import ProductCard from "@/components/ProductCard";
+import type { Product } from "@/lib/types";
 import "swiper/css";
 
-const MOCK_PRODUCTS = [
-  { id: 1, name: "사람의 탈 티셔츠 (블랙)", price: 30000 },
-  { id: 2, name: "사람의 탈 티셔츠 (화이트)", price: 30000 },
-  { id: 3, name: "사람의 탈 후드 (블랙)", price: 45000 },
-  { id: 4, name: "사람의 탈 모자", price: 20000 },
-  { id: 5, name: "사람의 탈 에코백", price: 15000 },
-  { id: 6, name: "사람의 탈 스티커 세트", price: 5000 },
-];
+interface ProductCarouselProps {
+  products: Product[];
+}
 
-export default function ProductCarousel() {
+export default function ProductCarousel({ products }: ProductCarouselProps) {
   const sectionRef = useScrollReveal<HTMLElement>({ y: 40, duration: 0.7 });
   const titleRef = useScrollReveal<HTMLHeadingElement>({
     y: 20,
     duration: 0.5,
     delay: 0.15,
   });
+
+  if (products.length === 0) return null;
 
   return (
     <section ref={sectionRef} className="py-6 md:py-10">
@@ -48,7 +46,7 @@ export default function ProductCarousel() {
             modules={[Navigation]}
             slidesPerView={3}
             spaceBetween={12}
-            loop
+            loop={products.length > 3}
             grabCursor
             navigation={{
               prevEl: ".product-prev",
@@ -59,12 +57,13 @@ export default function ProductCarousel() {
               768: { slidesPerView: 5, spaceBetween: 16 },
             }}
           >
-            {MOCK_PRODUCTS.map((product) => (
+            {products.map((product) => (
               <SwiperSlide key={product.id}>
                 <ProductCard
                   id={product.id}
                   name={product.name}
                   price={product.price}
+                  image={product.images[0] ?? null}
                 />
               </SwiperSlide>
             ))}

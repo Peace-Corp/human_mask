@@ -3,8 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-
-const EXPECTED_AMOUNT = 10000;
+import { clearCart } from "@/utils/cart";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -17,7 +16,12 @@ function PaymentSuccessContent() {
   const paymentKey = searchParams.get("paymentKey");
   const orderId = searchParams.get("orderId");
   const amount = searchParams.get("amount");
-  const isValid = amount ? Number(amount) === EXPECTED_AMOUNT : false;
+  const expectedAmount = typeof window !== "undefined"
+    ? localStorage.getItem("expected_payment_amount")
+    : null;
+  const isValid = amount && expectedAmount
+    ? Number(amount) === Number(expectedAmount)
+    : false;
 
   useEffect(() => {
     if (paymentKey && orderId && amount && isValid) {
@@ -43,6 +47,10 @@ function PaymentSuccessContent() {
 
       // Simulating backend confirmation for test mode
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Clear cart and expected amount after successful payment
+      clearCart();
+      localStorage.removeItem("expected_payment_amount");
 
       setConfirmResult({
         success: true,

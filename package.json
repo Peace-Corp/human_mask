@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@paypal/react-paypal-js": "^8.9.2",
+    "@supabase/supabase-js": "^2.95.3",
     "@tosspayments/tosspayments-sdk": "^2.5.0",
     "gsap": "^3.14.2",
     "lucide-react": "^0.563.0",

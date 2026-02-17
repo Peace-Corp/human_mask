@@ -32,14 +32,14 @@ export default function ContactPage() {
             </div>
 
             {/* Address */}
-            <div className="flex items-start gap-3 rounded-lg border border-neutral-200 p-4 md:p-5">
+            {/* <div className="flex items-start gap-3 rounded-lg border border-neutral-200 p-4 md:p-5">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
               <div>
                 <h3 className="text-xs font-bold text-neutral-800 md:text-sm">주소</h3>
                 <p className="mt-1 text-[11px] text-neutral-500 md:text-xs">서울특별시 마포구 세터산 4길 2, b102호</p>
                 <p className="mt-0.5 text-[10px] text-neutral-400">상호명: 피스코프</p>
               </div>
-            </div>
+            </div> */}
 
             {/* Hours */}
             <div className="flex items-start gap-3 rounded-lg border border-neutral-200 p-4 md:p-5">

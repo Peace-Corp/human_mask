@@ -1,23 +1,19 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import gsap from "gsap";
+import type { BrandHeroBanner } from "@/lib/types";
 import "swiper/css";
 
-const SLIDES = [
-  { label: "배너 이미지 1", bgColor: "#E8D44D" },
-  { label: "배너 이미지 2", bgColor: "#4DA8E8" },
-  { label: "배너 이미지 3", bgColor: "#E85A4D" },
-  { label: "배너 이미지 4", bgColor: "#6B4DE8" },
-  { label: "배너 이미지 5", bgColor: "#6B4DE7" },
-  { label: "배너 이미지 6", bgColor: "#6B4DE4" },
-  { label: "배너 이미지 7", bgColor: "#6B4DE2" },
-];
+interface HeroCarouselProps {
+  banners: BrandHeroBanner[];
+}
 
-export default function HeroCarousel() {
+export default function HeroCarousel({ banners }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
   const bgRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -29,9 +25,10 @@ export default function HeroCarousel() {
       setCurrent(newIndex);
 
       // Animate background color
-      if (bgRef.current) {
+      const newColor = banners[newIndex]?.color;
+      if (bgRef.current && newColor) {
         gsap.to(bgRef.current, {
-          backgroundColor: SLIDES[newIndex].bgColor,
+          backgroundColor: newColor,
           duration: 0.6,
           ease: "power2.inOut",
         });
@@ -54,17 +51,21 @@ export default function HeroCarousel() {
         });
       }
     },
-    [current]
+    [current, banners]
   );
+
+  if (banners.length === 0) return null;
 
   return (
     <section className="relative w-full pt-14">
-      {/* Background — fills width, ~60% height, color animated via GSAP */}
-      <div
-        ref={bgRef}
-        className="absolute inset-x-0 top-0 h-[60%]"
-        style={{ backgroundColor: SLIDES[0].bgColor }}
-      />
+      {/* Background color — animated via GSAP on slide change */}
+      {banners[0]?.color && (
+        <div
+          ref={bgRef}
+          className="absolute inset-x-0 top-0 h-[60%]"
+          style={{ backgroundColor: banners[0].color }}
+        />
+      )}
 
       <div className="relative">
         {/* Swiper carousel */}
@@ -74,7 +75,7 @@ export default function HeroCarousel() {
             slidesPerView={1.8}
             centeredSlides
             spaceBetween={32}
-            loop
+            loop={banners.length > 1}
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             navigation={{
               prevEl: ".hero-prev",
@@ -82,47 +83,60 @@ export default function HeroCarousel() {
             }}
             onSlideChange={handleSlideChange}
           >
-            {SLIDES.map((slide, i) => (
-              <SwiperSlide key={i}>
+            {banners.map((banner) => (
+              <SwiperSlide key={banner.id}>
                 <div
-                  className="flex items-center justify-center bg-gray-200"
+                  className="relative overflow-hidden bg-gray-200"
                   style={{ aspectRatio: "1.7 / 1" }}
                 >
-                  <span className="text-xs text-neutral-400">
-                    {slide.label}
-                  </span>
+                  <Image
+                    src={banner.image_link}
+                    alt={banner.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 80vw, 60vw"
+                    priority
+                  />
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
 
           {/* Arrow buttons */}
-          <button
-            className="hero-prev absolute left-[22%] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-            aria-label="이전 슬라이드"
-          >
-            <ChevronLeft className="h-7 w-7 md:h-9 md:w-9" />
-          </button>
-          <button
-            className="hero-next absolute right-[22%] top-1/2 z-10 translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
-            aria-label="다음 슬라이드"
-          >
-            <ChevronRight className="h-7 w-7 md:h-9 md:w-9" />
-          </button>
+          {banners.length > 1 && (
+            <>
+              <button
+                className="hero-prev absolute left-[22%] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                aria-label="이전 슬라이드"
+              >
+                <ChevronLeft className="h-7 w-7 md:h-9 md:w-9" />
+              </button>
+              <button
+                className="hero-next absolute right-[22%] top-1/2 z-10 translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                aria-label="다음 슬라이드"
+              >
+                <ChevronRight className="h-7 w-7 md:h-9 md:w-9" />
+              </button>
+            </>
+          )}
         </div>
 
         {/* Dot indicators */}
-        <div className="flex items-center justify-center gap-1.5 py-3 md:py-4">
-          {SLIDES.map((_, i) => (
-            <span
-              key={i}
-              ref={(el) => { dotRefs.current[i] = el; }}
-              className={`h-2 w-2 rounded-full transition-colors ${
-                i === current ? "bg-neutral-800" : "bg-neutral-300"
-              }`}
-            />
-          ))}
-        </div>
+        {banners.length > 1 && (
+          <div className="flex items-center justify-center gap-1.5 py-3 md:py-4">
+            {banners.map((_, i) => (
+              <span
+                key={i}
+                ref={(el) => {
+                  dotRefs.current[i] = el;
+                }}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  i === current ? "bg-neutral-800" : "bg-neutral-300"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

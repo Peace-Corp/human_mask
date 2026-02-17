@@ -2,13 +2,15 @@
 
 import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
-import { User, ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X } from "lucide-react";
 import gsap from "gsap";
+import { getCartCount } from "@/utils/cart";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     if (!headerRef.current) return;
@@ -25,6 +27,13 @@ export default function Header() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setCartCount(getCartCount());
+    const onCartChange = () => setCartCount(getCartCount());
+    window.addEventListener("cart-change", onCartChange);
+    return () => window.removeEventListener("cart-change", onCartChange);
   }, []);
 
   useEffect(() => {
@@ -65,9 +74,14 @@ export default function Header() {
         <div
           className={`hidden items-center gap-2 md:flex ${scrolled ? "text-black" : "text-white"}`}
         >
-          <button aria-label="장바구니" className="hover:opacity-70">
+          <Link href="/cart" aria-label="장바구니" className="relative hover:opacity-70">
             <ShoppingCart className="h-5 w-5" />
-          </button>
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
         </div>
 
         <button
@@ -122,9 +136,19 @@ export default function Header() {
         </nav>
 
         <div className="border-t border-gray-100 px-4 py-3 flex items-center gap-4">
-          <button aria-label="장바구니" className="hover:opacity-70">
+          <Link
+            href="/cart"
+            aria-label="장바구니"
+            className="relative hover:opacity-70"
+            onClick={() => setSidebarOpen(false)}
+          >
             <ShoppingCart className="h-5 w-5" />
-          </button>
+            {cartCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       </aside>
     </>

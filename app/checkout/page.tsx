@@ -1,25 +1,32 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   loadTossPayments,
   TossPaymentsWidgets,
   ANONYMOUS,
 } from "@tosspayments/tosspayments-sdk";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { getCart, getCartTotal } from "@/utils/cart";
+import { formatPrice } from "@/utils/formatPrice";
+import type { CartItem } from "@/lib/types";
 
-const TEST_AMOUNT_KRW = 10000; // 10,000 KRW
-const TEST_AMOUNT_USD = "8.00"; // ~$8 USD equivalent
+const KRW_TO_USD_RATE = 0.00075;
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!;
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!;
 
 type PaymentMethod = "toss" | "paypal";
 
 function TossPaymentSection({
+  amount,
+  orderName,
   isProcessing,
   setIsProcessing,
   setError,
 }: {
+  amount: number;
+  orderName: string;
   isProcessing: boolean;
   setIsProcessing: (v: boolean) => void;
   setError: (v: string | null) => void;
@@ -41,7 +48,7 @@ function TossPaymentSection({
 
         await widgetsInstance.setAmount({
           currency: "KRW",
-          value: TEST_AMOUNT_KRW,
+          value: amount,
         });
 
         setWidgets(widgetsInstance);
@@ -52,7 +59,7 @@ function TossPaymentSection({
     }
 
     initTossPayments();
-  }, [setError]);
+  }, [amount, setError]);
 
   useEffect(() => {
     if (!widgets) return;
@@ -76,11 +83,14 @@ function TossPaymentSection({
   const handlePayment = async () => {
     if (!widgets || !isReady || isProcessing) return;
 
+    // Store expected amount for validation on success page
+    localStorage.setItem("expected_payment_amount", String(amount));
+
     setIsProcessing(true);
     try {
       await widgets.requestPayment({
         orderId: `order_${Date.now()}`,
-        orderName: "테스트 상품",
+        orderName,
         successUrl: `${window.location.origin}/payment/success`,
         failUrl: `${window.location.origin}/payment/fail`,
         customerEmail: "test@example.com",
@@ -124,17 +134,19 @@ function TossPaymentSection({
       >
         {isProcessing
           ? "처리 중..."
-          : `${TEST_AMOUNT_KRW.toLocaleString()}원 결제하기`}
+          : `${amount.toLocaleString()}원 결제하기`}
       </button>
     </>
   );
 }
 
 function PayPalPaymentSection({
+  amountUSD,
   isProcessing,
   setIsProcessing,
   setError,
 }: {
+  amountUSD: string;
   isProcessing: boolean;
   setIsProcessing: (v: boolean) => void;
   setError: (v: string | null) => void;
@@ -142,16 +154,8 @@ function PayPalPaymentSection({
   const onApprove = async (data: { orderID: string }) => {
     setIsProcessing(true);
     try {
-      // In production, capture the order on your backend
-      // const response = await fetch('/api/paypal/capture-order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ orderID: data.orderID }),
-      // });
-      // const result = await response.json();
-
       console.log("PayPal order approved:", data.orderID);
-      window.location.href = `/payment/success?orderId=${data.orderID}&amount=${TEST_AMOUNT_USD}&paymentType=paypal`;
+      window.location.href = `/payment/success?orderId=${data.orderID}&amount=${amountUSD}&paymentType=paypal`;
     } catch (err) {
       console.error("PayPal capture failed:", err);
       setError("PayPal 결제 처리 중 오류가 발생했습니다.");
@@ -174,7 +178,7 @@ function PayPalPaymentSection({
         PayPal로 결제
       </h2>
       <p className="text-sm text-gray-500 mb-4">
-        해외 결제를 위한 PayPal 결제입니다. (${TEST_AMOUNT_USD} USD)
+        해외 결제를 위한 PayPal 결제입니다. (${amountUSD} USD)
       </p>
 
       <PayPalScriptProvider
@@ -193,15 +197,18 @@ function PayPalPaymentSection({
           }}
           disabled={isProcessing}
           createOrder={async (_data, actions) => {
+            // Store expected amount for validation on success page
+            localStorage.setItem("expected_payment_amount", amountUSD);
+
             return actions.order.create({
               intent: "CAPTURE",
               purchase_units: [
                 {
                   amount: {
                     currency_code: "USD",
-                    value: TEST_AMOUNT_USD,
+                    value: amountUSD,
                   },
-                  description: "테스트 상품",
+                  description: "사람의탈 상품",
                 },
               ],
             });
@@ -222,9 +229,24 @@ function PayPalPaymentSection({
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("toss");
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [amountKRW, setAmountKRW] = useState(0);
+
+  useEffect(() => {
+    const items = getCart();
+    if (items.length === 0) {
+      router.replace("/cart");
+      return;
+    }
+    setCartItems(items);
+    setAmountKRW(getCartTotal());
+  }, [router]);
+
+  const amountUSD = (amountKRW * KRW_TO_USD_RATE).toFixed(2);
 
   if (!TOSS_CLIENT_KEY || !PAYPAL_CLIENT_ID) {
     return (
@@ -257,22 +279,45 @@ export default function CheckoutPage() {
     );
   }
 
+  if (cartItems.length === 0) {
+    return null; // Redirecting to /cart
+  }
+
+  const orderName =
+    cartItems.length === 1
+      ? `${cartItems[0].productName} (${cartItems[0].size})`
+      : `${cartItems[0].productName} 외 ${cartItems.length - 1}건`;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-lg mx-auto">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">결제하기</h1>
-          <p className="text-gray-500 mb-6">테스트 결제</p>
+          <p className="text-gray-500 mb-6">주문 내역을 확인해주세요.</p>
 
+          {/* Order summary */}
           <div className="border-t border-b py-4 mb-6">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-700">테스트 상품</span>
+            {cartItems.map((item) => (
+              <div
+                key={item.variantId}
+                className="flex justify-between items-center py-1"
+              >
+                <span className="text-sm text-gray-700">
+                  {item.productName} ({item.size}) x {item.quantity}
+                </span>
+                <span className="text-sm font-medium">
+                  {formatPrice(item.price * item.quantity)}
+                </span>
+              </div>
+            ))}
+            <div className="flex justify-between items-center pt-2 border-t mt-2">
+              <span className="font-semibold">합계</span>
               <div className="text-right">
                 <span className="text-lg font-semibold text-gray-900">
-                  {TEST_AMOUNT_KRW.toLocaleString()}원
+                  {formatPrice(amountKRW)}
                 </span>
                 <span className="text-sm text-gray-500 block">
-                  (${TEST_AMOUNT_USD} USD)
+                  (${amountUSD} USD)
                 </span>
               </div>
             </div>
@@ -307,12 +352,15 @@ export default function CheckoutPage() {
           {/* Payment Method Content */}
           {paymentMethod === "toss" ? (
             <TossPaymentSection
+              amount={amountKRW}
+              orderName={orderName}
               isProcessing={isProcessing}
               setIsProcessing={setIsProcessing}
               setError={setError}
             />
           ) : (
             <PayPalPaymentSection
+              amountUSD={amountUSD}
               isProcessing={isProcessing}
               setIsProcessing={setIsProcessing}
               setError={setError}
