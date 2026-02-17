@@ -56,6 +56,20 @@ export async function getProductVariants(
   return data as ProductVariant[];
 }
 
+export async function getAllProductVariants(
+  productIds: string[]
+): Promise<ProductVariant[]> {
+  if (productIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from("product_variants")
+    .select("*")
+    .in("product_id", productIds)
+    .order("sort_order", { ascending: true });
+
+  if (error) throw error;
+  return data as ProductVariant[];
+}
+
 // --- Hero Banners ---
 
 export async function getHeroBanners(): Promise<BrandHeroBanner[]> {
