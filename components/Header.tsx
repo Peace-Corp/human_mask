@@ -60,17 +60,17 @@ export default function Header() {
         <div
           className={`hidden items-center gap-3 text-xs tracking-wide md:flex md:text-sm ${showSolid ? "text-black" : "text-white"}`}
         >
-          <Link href="/contact" className="font-bmk hover:opacity-70">
+          <Link href="/contact" className="hover:opacity-70">
             CONTACT
           </Link>
-          <Link href="/faq" className="font-bmk hover:opacity-70">
+          <Link href="/faq" className="hover:opacity-70">
             FAQ
           </Link>
         </div>
 
         <Link
           href="/"
-          className={`font-bmk text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg ${showSolid ? "text-black" : "text-white"}`}
+          className={`text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg ${showSolid ? "text-black" : "text-white"}`}
         >
           사람의 탈
         </Link>
@@ -122,7 +122,7 @@ export default function Header() {
         }`}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-          <span className="font-bmk text-sm font-bold">사람의 탈</span>
+          <span className="text-sm font-bold">사람의 탈</span>
           <button
             aria-label="닫기"
             onClick={() => setSidebarOpen(false)}
@@ -135,14 +135,14 @@ export default function Header() {
         <nav className="flex flex-col gap-1 px-4 py-3 text-sm">
           <Link
             href="/contact"
-            className="font-bmk rounded-md px-2 py-2 hover:bg-gray-100"
+            className="rounded-md px-2 py-2 hover:bg-gray-100"
             onClick={() => setSidebarOpen(false)}
           >
             CONTACT
           </Link>
           <Link
             href="/faq"
-            className="font-bmk rounded-md px-2 py-2 hover:bg-gray-100"
+            className="rounded-md px-2 py-2 hover:bg-gray-100"
             onClick={() => setSidebarOpen(false)}
           >
             FAQ

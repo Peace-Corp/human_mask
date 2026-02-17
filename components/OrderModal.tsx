@@ -107,7 +107,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
       {/* Floating order button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-5 py-3 font-bmk text-sm text-white shadow-lg transition-opacity hover:opacity-80 md:bottom-8 md:px-6 md:py-3.5 md:text-base"
+        className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-5 py-3 text-sm text-white shadow-lg transition-opacity hover:opacity-80 md:bottom-8 md:px-6 md:py-3.5 md:text-base"
         style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))" }}
       >
         <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" />
@@ -130,7 +130,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 md:px-5 md:py-4">
-          <h2 className="font-bmk text-base md:text-lg">제품 주문</h2>
+          <h2 className="text-base md:text-lg">제품 주문</h2>
           <button
             onClick={() => setOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral-100"
@@ -167,8 +167,8 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
                       )}
                     </div>
                     <div>
-                      <p className="font-bmk text-sm md:text-base">{product.name}</p>
-                      <p className="font-bmk text-sm text-neutral-600 md:text-base">
+                      <p className="text-sm md:text-base">{product.name}</p>
+                      <p className="text-sm text-neutral-600 md:text-base">
                         {formatPrice(product.price)}
                       </p>
                     </div>
@@ -189,7 +189,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
                               : "border border-[#c2c2c2] bg-[#eee]"
                           }`}
                         >
-                          <span className="font-bmk text-xs md:text-sm">
+                          <span className="text-xs md:text-sm">
                             {variant.size}
                           </span>
 
@@ -206,7 +206,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
                               <Minus className="h-3 w-3" />
                             </button>
 
-                            <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white font-bmk text-xs md:text-sm">
+                            <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
                               {qty}
                             </span>
 
@@ -239,7 +239,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
               {selectedItems.map((item) => (
                 <div
                   key={item.variant.id}
-                  className="flex items-center justify-between font-bmk text-xs"
+                  className="flex items-center justify-between text-xs"
                 >
                   <span>
                     {item.product.name} - {item.variant.size} x {item.quantity}
@@ -251,13 +251,13 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
           )}
 
           <div className="flex items-center gap-2">
-            <span className="font-bmk text-sm md:text-base">총금액</span>
+            <span className="text-sm md:text-base">총금액</span>
             {totalQuantity > 0 && (
-              <span className="font-bmk text-xs md:text-sm">
+              <span className="text-xs md:text-sm">
                 ({totalQuantity}개)
               </span>
             )}
-            <span className="ml-auto font-bmk text-base md:text-lg">
+            <span className="ml-auto text-base md:text-lg">
               {formatPrice(totalPrice)}
             </span>
           </div>
@@ -265,7 +265,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
           <button
             onClick={handleBuyNow}
             disabled={selectedItems.length === 0}
-            className="mt-2 w-full rounded-full bg-black py-2.5 font-bmk text-xs text-white transition-opacity hover:opacity-80 disabled:opacity-40 md:py-3 md:text-sm"
+            className="mt-2 w-full rounded-full bg-black py-2.5 text-xs text-white transition-opacity hover:opacity-80 disabled:opacity-40 md:py-3 md:text-sm"
           >
             구매하기
           </button>

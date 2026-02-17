@@ -132,12 +132,12 @@ export default function CartPage() {
       <div className="flex min-h-screen flex-col">
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
           <ShoppingCart className="h-12 w-12 text-neutral-300" />
-          <p className="font-bmk text-sm text-neutral-500">
+          <p className="text-sm text-neutral-500">
             장바구니가 비어 있습니다.
           </p>
           <Link
             href="/"
-            className="mt-2 rounded-full bg-black px-6 py-2.5 font-bmk text-xs text-white hover:opacity-80"
+            className="mt-2 rounded-full bg-black px-6 py-2.5 text-xs text-white hover:opacity-80"
           >
             쇼핑하러 가기
           </Link>
@@ -149,7 +149,7 @@ export default function CartPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 pt-16 pb-8 md:px-6 md:pt-20">
-        <h1 className="font-bmk text-lg md:text-xl">장바구니</h1>
+        <h1 className="text-lg md:text-xl">장바구니</h1>
 
         {/* Warnings */}
         {warnings.length > 0 && (
@@ -189,11 +189,11 @@ export default function CartPage() {
               {/* Info */}
               <div className="flex flex-1 flex-col justify-between">
                 <div>
-                  <span className="font-bmk text-sm md:text-base">
+                  <span className="text-sm md:text-base">
                     {item.productName}
                   </span>
                   <p className="text-xs text-neutral-500">{item.size}</p>
-                  <p className="mt-0.5 font-bmk text-sm">
+                  <p className="mt-0.5 text-sm">
                     {formatPrice(item.price)}
                   </p>
                 </div>
@@ -209,7 +209,7 @@ export default function CartPage() {
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="flex h-7 w-9 items-center justify-center rounded-md bg-neutral-100 font-bmk text-sm">
+                  <span className="flex h-7 w-9 items-center justify-center rounded-md bg-neutral-100 text-sm">
                     {item.quantity}
                   </span>
                   <button
@@ -233,7 +233,7 @@ export default function CartPage() {
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-                <span className="font-bmk text-sm md:text-base">
+                <span className="text-sm md:text-base">
                   {formatPrice(item.price * item.quantity)}
                 </span>
               </div>
@@ -244,18 +244,18 @@ export default function CartPage() {
         {/* Summary */}
         <div className="mt-4 border-t border-neutral-200 pt-4">
           <div className="flex items-center justify-between">
-            <span className="font-bmk text-lg">
+            <span className="text-lg">
               총금액{" "}
               <span className="text-sm">({totalCount}개)</span>
             </span>
-            <span className="font-bmk text-xl md:text-2xl">
+            <span className="text-xl md:text-2xl">
               {formatPrice(totalPrice)}
             </span>
           </div>
 
           <Link
             href="/checkout"
-            className="mt-3 block w-full rounded-full bg-black py-3 text-center font-bmk text-xs text-white transition-opacity hover:opacity-80 md:text-sm"
+            className="mt-3 block w-full rounded-full bg-black py-3 text-center text-xs text-white transition-opacity hover:opacity-80 md:text-sm"
           >
             주문하기
           </Link>

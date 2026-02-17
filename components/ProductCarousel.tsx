@@ -26,7 +26,7 @@ export default function ProductCarousel({ products }: ProductCarouselProps) {
     <section ref={sectionRef} className="py-6 md:py-10">
       <h2
         ref={titleRef}
-        className="mb-4 text-center font-bmk text-base font-bold md:mb-6 md:text-lg"
+        className="mb-4 text-center text-base font-bold md:mb-6 md:text-lg"
       >
         제품 구성
       </h2>

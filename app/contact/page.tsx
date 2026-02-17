@@ -6,7 +6,7 @@ export default function ContactPage() {
     <div className="flex min-h-screen flex-col bg-white">
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 md:px-6">
         <main className="flex-1 py-10 md:py-16">
-          <h2 className="mb-8 text-center font-bmk text-xl font-bold md:mb-12 md:text-2xl">
+          <h2 className="mb-8 text-center text-xl font-bold md:mb-12 md:text-2xl">
             문의하기
           </h2>
 
