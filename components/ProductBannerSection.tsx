@@ -8,7 +8,7 @@ export default function ProductBannerSection({
   imageUrl,
 }: ProductBannerSectionProps) {
   return (
-    <section className="flex flex-1 items-center justify-center px-4 py-12 md:px-8 md:py-20">
+    <section className="flex flex-1 items-center justify-center px-2 py-12 md:px-4 md:py-20">
       <div className="relative w-full max-w-3xl">
         <Image
           src={imageUrl}

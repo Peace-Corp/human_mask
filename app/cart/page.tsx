@@ -170,36 +170,28 @@ export default function CartPage() {
               className="flex gap-3 border-b border-neutral-100 py-3"
             >
               {/* Thumbnail */}
-              <Link
-                href={`/product/${item.productId}`}
-                className="shrink-0"
-              >
-                <div className="relative h-20 w-20 overflow-hidden bg-neutral-100 md:h-24 md:w-24">
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.productName}
-                      fill
-                      className="object-cover"
-                      sizes="96px"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[10px] text-neutral-400">
-                      No Image
-                    </div>
-                  )}
-                </div>
-              </Link>
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden bg-neutral-100 md:h-24 md:w-24">
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.productName}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-[10px] text-neutral-400">
+                    No Image
+                  </div>
+                )}
+              </div>
 
               {/* Info */}
               <div className="flex flex-1 flex-col justify-between">
                 <div>
-                  <Link
-                    href={`/product/${item.productId}`}
-                    className="font-bmk text-sm hover:underline md:text-base"
-                  >
+                  <span className="font-bmk text-sm md:text-base">
                     {item.productName}
-                  </Link>
+                  </span>
                   <p className="text-xs text-neutral-500">{item.size}</p>
                   <p className="mt-0.5 font-bmk text-sm">
                     {formatPrice(item.price)}
