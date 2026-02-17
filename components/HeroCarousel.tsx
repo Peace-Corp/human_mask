@@ -15,7 +15,8 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({ banners }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
-  const bgRef = useRef<HTMLDivElement>(null);
+  const bgBottomRef = useRef<HTMLImageElement>(null);
+  const bgTopRef = useRef<HTMLImageElement>(null);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   const handleSlideChange = useCallback(
@@ -24,14 +25,27 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
       const oldIndex = current;
       setCurrent(newIndex);
 
-      // Animate background color
-      const newColor = banners[newIndex]?.color;
-      if (bgRef.current && newColor) {
-        gsap.to(bgRef.current, {
-          backgroundColor: newColor,
-          duration: 0.6,
-          ease: "power2.inOut",
-        });
+      // Crossfade blurred background image
+      const newImage = banners[newIndex]?.image_link;
+      if (bgTopRef.current && bgBottomRef.current && newImage) {
+        // Set the new image on the top layer and fade it in over the bottom
+        bgTopRef.current.src = newImage;
+        gsap.fromTo(
+          bgTopRef.current,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            duration: 0.6,
+            ease: "power2.inOut",
+            onComplete: () => {
+              // Once visible, copy to bottom layer and hide top for next transition
+              if (bgBottomRef.current && bgTopRef.current) {
+                bgBottomRef.current.src = newImage;
+                gsap.set(bgTopRef.current, { opacity: 0 });
+              }
+            },
+          }
+        );
       }
 
       // Animate dots: shrink old, bounce new
@@ -58,13 +72,22 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
 
   return (
     <section className="relative w-full pt-14">
-      {/* Background color — animated via GSAP on slide change */}
-      {banners[0]?.color && (
-        <div
-          ref={bgRef}
-          className="absolute inset-x-0 top-0 h-[60%]"
-          style={{ backgroundColor: banners[0].color }}
-        />
+      {/* Blurred background image — crossfaded via GSAP on slide change */}
+      {banners[0]?.image_link && (
+        <div className="absolute inset-x-0 top-0 h-[70%] overflow-hidden">
+          <img
+            ref={bgBottomRef}
+            src={banners[0].image_link}
+            alt=""
+            className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
+          />
+          <img
+            ref={bgTopRef}
+            src={banners[0].image_link}
+            alt=""
+            className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl opacity-0"
+          />
+        </div>
       )}
 
       <div className="relative">
