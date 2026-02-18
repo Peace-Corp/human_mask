@@ -50,15 +50,13 @@ export default function Header() {
     <>
       <header
         ref={headerRef}
-        className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-2.5 transition-all duration-300 md:px-6 md:py-3 ${
-          showSolid
-            ? "bg-white/10 backdrop-blur-md shadow-sm"
-            : "mix-blend-difference"
+        className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-2.5 text-black transition-all duration-300 md:px-6 md:py-3 ${
+          showSolid ? "bg-white/10 backdrop-blur-md shadow-sm" : ""
         }`}
       >
         {/* Desktop: nav links | Mobile: brand name */}
         <div
-          className={`hidden items-center gap-3 text-xs tracking-wide md:flex md:text-sm ${showSolid ? "text-black" : "text-white"}`}
+          className="hidden items-center gap-3 text-xs tracking-wide md:flex md:text-sm"
         >
           <Link href="/contact" className="hover:opacity-70">
             CONTACT
@@ -70,14 +68,14 @@ export default function Header() {
 
         <Link
           href="/"
-          className={`text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg ${showSolid ? "text-black" : "text-white"}`}
+          className="text-sm font-bold md:absolute md:left-1/2 md:-translate-x-1/2 md:text-lg"
         >
           사람의 탈
         </Link>
 
         {/* Desktop: icons | Mobile: hamburger */}
         <div
-          className={`hidden items-center gap-2 md:flex ${showSolid ? "text-black" : "text-white"}`}
+          className="hidden items-center gap-2 md:flex"
         >
           <Link href="/cart" aria-label="장바구니" className="relative hover:opacity-70">
             <ShoppingCart className="h-5 w-5" />
@@ -89,7 +87,7 @@ export default function Header() {
           </Link>
         </div>
 
-        <div className={`flex items-center gap-3 md:hidden ${showSolid ? "text-black" : "text-white"}`}>
+        <div className="flex items-center gap-3 md:hidden">
           <Link href="/cart" aria-label="장바구니" className="relative hover:opacity-70">
             <ShoppingCart className="h-5 w-5" />
             {cartCount > 0 && (

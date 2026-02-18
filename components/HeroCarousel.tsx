@@ -129,13 +129,13 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
           {banners.length > 1 && (
             <>
               <button
-                className="hero-prev absolute left-[22%] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                className="hero-prev absolute left-[22%] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-black hover:opacity-70"
                 aria-label="이전 슬라이드"
               >
                 <ChevronLeft className="h-7 w-7 md:h-9 md:w-9" />
               </button>
               <button
-                className="hero-next absolute right-[22%] top-1/2 z-10 translate-x-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                className="hero-next absolute right-[22%] top-1/2 z-10 translate-x-1/2 -translate-y-1/2 text-black hover:opacity-70"
                 aria-label="다음 슬라이드"
               >
                 <ChevronRight className="h-7 w-7 md:h-9 md:w-9" />
