@@ -179,45 +179,56 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
                     {productVariants.map((variant) => {
                       const qty = quantities[variant.id] || 0;
                       const isActive = qty > 0;
+                      const isSoldOut = variant.stock === 0;
 
                       return (
                         <div
                           key={variant.id}
                           className={`flex items-center rounded-full px-3 py-2 md:px-4 md:py-2.5 ${
-                            isActive
-                              ? "border-2 border-[#8793ff] bg-[#eee]"
-                              : "border border-[#c2c2c2] bg-[#eee]"
+                            isSoldOut
+                              ? "border border-[#c2c2c2] bg-[#e5e5e5] opacity-60"
+                              : isActive
+                                ? "border-2 border-[#8793ff] bg-[#eee]"
+                                : "border border-[#c2c2c2] bg-[#eee]"
                           }`}
                         >
                           <span className="text-xs md:text-sm">
                             {variant.size}
                           </span>
 
-                          <span className="ml-auto mr-2 text-[10px] text-[#9e9e9e] md:mr-3 md:text-[11px]">
-                            재고 [{variant.stock}]
-                          </span>
-
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => updateQuantity(variant.id, -1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
-                              aria-label={`${variant.size} 수량 감소`}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-
-                            <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
-                              {qty}
+                          {isSoldOut ? (
+                            <span className="ml-auto text-[10px] text-red-400 md:text-[11px]">
+                              품절
                             </span>
+                          ) : (
+                            <>
+                              <span className="ml-auto mr-2 text-[10px] text-[#9e9e9e] md:mr-3 md:text-[11px]">
+                                재고 [{variant.stock}]
+                              </span>
 
-                            <button
-                              onClick={() => updateQuantity(variant.id, 1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
-                              aria-label={`${variant.size} 수량 증가`}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
-                          </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => updateQuantity(variant.id, -1)}
+                                  className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                                  aria-label={`${variant.size} 수량 감소`}
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </button>
+
+                                <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
+                                  {qty}
+                                </span>
+
+                                <button
+                                  onClick={() => updateQuantity(variant.id, 1)}
+                                  className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                                  aria-label={`${variant.size} 수량 증가`}
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       );
                     })}

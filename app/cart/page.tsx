@@ -10,7 +10,7 @@ import {
   updateCartItemQuantity,
   removeFromCart,
 } from "@/utils/cart";
-import { getProductVariants } from "@/lib/fetchers";
+import { getAllProductVariants } from "@/lib/fetchers";
 import type { CartItem, ProductVariant } from "@/lib/types";
 import Footer from "@/components/Footer";
 
@@ -31,18 +31,16 @@ export default function CartPage() {
 
       // Fetch fresh variant stock for all products in cart
       const productIds = [...new Set(items.map((i) => i.productId))];
-      const allVariants: ProductVariant[] = [];
+      let allVariants: ProductVariant[] = [];
 
-      await Promise.all(
-        productIds.map(async (pid) => {
-          try {
-            const variants = await getProductVariants(pid);
-            allVariants.push(...variants);
-          } catch {
-            // Product may have been deleted
-          }
-        })
-      );
+      try {
+        allVariants = await getAllProductVariants(productIds);
+      } catch {
+        // If fetch fails, show cart without stock validation
+        setCartItems(items);
+        setLoading(false);
+        return;
+      }
 
       // Build stock lookup
       const stock: Record<string, number> = {};
