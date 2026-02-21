@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Check } from "lucide-react";
 import { formatPrice } from "@/utils/formatPrice";
 import { addToCart } from "@/utils/cart";
 import { getProductById, getProductVariants } from "@/lib/fetchers";
@@ -17,6 +17,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,8 +27,27 @@ export default function ProductDetailPage() {
         getProductVariants(id),
       ]);
       setProduct(p);
-      setVariants(v);
-      setQuantities(Object.fromEntries(v.map((variant) => [variant.id, 0])));
+      // If no variants exist, create a default one from the product
+      const effectiveVariants =
+        v.length > 0
+          ? v
+          : p
+            ? [
+                {
+                  id: p.id,
+                  product_id: p.id,
+                  size: "",
+                  stock: p.stock,
+                  sort_order: 0,
+                  created_at: "",
+                  updated_at: "",
+                } as ProductVariant,
+              ]
+            : [];
+      setVariants(effectiveVariants);
+      setQuantities(
+        Object.fromEntries(effectiveVariants.map((variant) => [variant.id, 0]))
+      );
       setLoading(false);
     }
     load();
@@ -84,6 +104,16 @@ export default function ProductDetailPage() {
     if (items.length === 0) return;
     for (const item of items) addToCart(item);
     setQuantities(Object.fromEntries(variants.map((v) => [v.id, 0])));
+    setShowConfirmation(true);
+  };
+
+  const handleGoToCart = () => {
+    setShowConfirmation(false);
+    router.push("/cart");
+  };
+
+  const handleContinueShopping = () => {
+    setShowConfirmation(false);
   };
 
   if (loading) {
@@ -110,7 +140,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const hasVariants = variants.length > 0;
+  const isSingleVariant = variants.length <= 1;
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -144,8 +174,39 @@ export default function ProductDetailPage() {
               {formatPrice(product.price)}
             </p>
 
-            {/* Size options */}
-            {hasVariants && (
+            {/* Options */}
+            {isSingleVariant ? (
+              /* Single variant — just quantity controls */
+              <div className="mt-4">
+                {variants[0].stock === 0 ? (
+                  <p className="text-xs text-red-400">품절</p>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-neutral-500">수량</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => updateQuantity(variants[0].id, -1)}
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                        aria-label="수량 감소"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="flex h-7 w-9 items-center justify-center rounded-md bg-[#eee] text-xs md:text-sm">
+                        {quantities[variants[0].id] || 0}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(variants[0].id, 1)}
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                        aria-label="수량 증가"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : variants.length > 1 ? (
+              /* Multiple variants — size option pills */
               <div className="mt-4 flex flex-col gap-2">
                 {variants.map((variant) => {
                   const qty = quantities[variant.id] || 0;
@@ -201,10 +262,10 @@ export default function ProductDetailPage() {
                   );
                 })}
               </div>
-            )}
+            ) : null}
 
-            {/* Selected items summary */}
-            {selectedItems.length > 0 && (
+            {/* Selected items summary (multi-variant only) */}
+            {!isSingleVariant && selectedItems.length > 0 && (
               <div className="mt-4 border-t border-neutral-200 pt-3">
                 <div className="flex flex-col gap-0.5">
                   {selectedItems.map((item) => (
@@ -277,6 +338,38 @@ export default function ProductDetailPage() {
       <div className="mx-auto w-full max-w-5xl">
         <Footer />
       </div>
+
+      {/* Added to cart confirmation modal */}
+      {showConfirmation && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/50"
+            onClick={handleContinueShopping}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white px-5 py-6 shadow-xl">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
+                <Check className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm">장바구니에 담겼습니다</p>
+            </div>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={handleContinueShopping}
+                className="flex-1 rounded-full border border-neutral-300 py-2.5 text-xs transition-colors hover:bg-neutral-50"
+              >
+                계속 쇼핑하기
+              </button>
+              <button
+                onClick={handleGoToCart}
+                className="flex-1 rounded-full bg-black py-2.5 text-xs text-white transition-opacity hover:opacity-80"
+              >
+                장바구니로 이동
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
