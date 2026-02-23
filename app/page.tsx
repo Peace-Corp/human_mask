@@ -1,9 +1,14 @@
 import HeroCarousel from "@/components/HeroCarousel";
-import ProductCarousel from "@/components/ProductCarousel";
-import Footer from "@/components/Footer";
-import ProductBannerSection from "@/components/ProductBannerSection";
-import { getProducts, getHeroBanners, getBrandOrderDetailImage, getAllProductVariants } from "@/lib/fetchers";
-import OrderModal from "@/components/OrderModal";
+import HomeContent from "@/components/HomeContent";
+import BannerPopupModal from "@/components/BannerPopupModal";
+import {
+  getProducts,
+  getHeroBanners,
+  getBrandOrderDetailImage,
+  getAllProductVariants,
+} from "@/lib/fetchers";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [products, banners, orderDetailImage] = await Promise.all([
@@ -16,24 +21,17 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* Hero area — full width, background color driven by active slide */}
       <HeroCarousel banners={banners} />
 
-      {/* Content area — constrained width */}
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
-        <main className="flex flex-1 flex-col">
-          {/* Product Lineup */}
-          <ProductCarousel products={products} />
-
-          {/* Product Banner */}
-          {orderDetailImage && <ProductBannerSection imageUrl={orderDetailImage} />}
-        </main>
-
-        <Footer />
+        <HomeContent
+          products={products}
+          variants={variants}
+          orderDetailImage={orderDetailImage}
+        />
       </div>
 
-      {/* Floating order button + modal */}
-      <OrderModal products={products} variants={variants} />
+      {orderDetailImage && <BannerPopupModal imageUrl={orderDetailImage} />}
     </div>
   );
 }
