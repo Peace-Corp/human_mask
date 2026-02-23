@@ -33,7 +33,7 @@ export default async function Home() {
       </div>
 
       {/* Floating order button + modal */}
-      <OrderModal products={products} variants={variants} />
+      {/* <OrderModal products={products} variants={variants} /> */}
     </div>
   );
 }
