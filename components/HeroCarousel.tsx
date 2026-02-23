@@ -116,6 +116,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
                     src={banner.image_link}
                     alt={banner.title}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 768px) 80vw, 60vw"
                     priority
