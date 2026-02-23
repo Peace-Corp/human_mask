@@ -12,7 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ id, name, price, image }: ProductCardProps) {
   return (
-    <Link href={`/products/${id}`}>
+    <div>
       <div
         className="relative w-full overflow-hidden rounded bg-gray-100"
         style={{ aspectRatio: "0.7 / 1" }}
@@ -51,6 +51,6 @@ export default function ProductCard({ id, name, price, image }: ProductCardProps
           {formatPrice(price)}
         </p>
       </div>
-    </Link>
+    </div>
   );
 }
