@@ -1,9 +1,9 @@
 import HeroCarousel from "@/components/HeroCarousel";
 import ProductCarousel from "@/components/ProductCarousel";
-import OrderModal from "@/components/OrderModal";
 import Footer from "@/components/Footer";
 import ProductBannerSection from "@/components/ProductBannerSection";
-import { getProducts, getHeroBanners, getAllProductVariants, getBrandOrderDetailImage } from "@/lib/fetchers";
+import { getProducts, getHeroBanners, getBrandOrderDetailImage, getAllProductVariants } from "@/lib/fetchers";
+import OrderModal from "@/components/OrderModal";
 
 export default async function Home() {
   const [products, banners, orderDetailImage] = await Promise.all([
@@ -33,7 +33,7 @@ export default async function Home() {
       </div>
 
       {/* Floating order button + modal */}
-      <OrderModal products={products} variants={variants} />
+      {/* <OrderModal products={products} variants={variants} /> */}
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { X, Minus, Plus, ShoppingBag } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, Check } from "lucide-react";
 import { formatPrice } from "@/utils/formatPrice";
 import { addToCart } from "@/utils/cart";
 import type { Product, ProductVariant, CartItem } from "@/lib/types";
@@ -16,16 +16,8 @@ interface OrderModalProps {
 export default function OrderModal({ products, variants }: OrderModalProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-
-  // Initialize quantities when modal opens
-  const initQuantities = useCallback(() => {
-    setQuantities(Object.fromEntries(variants.map((v) => [v.id, 0])));
-  }, [variants]);
-
-  useEffect(() => {
-    initQuantities();
-  }, [initQuantities]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -41,13 +33,47 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
       if (!map[v.product_id]) map[v.product_id] = [];
       map[v.product_id].push(v);
     }
+    // Create synthetic variant for products with no variants
+    for (const p of products) {
+      if (!map[p.id] || map[p.id].length === 0) {
+        map[p.id] = [
+          {
+            id: p.id,
+            product_id: p.id,
+            size: "",
+            stock: p.stock,
+            sort_order: 0,
+            created_at: "",
+            updated_at: "",
+          },
+        ];
+      }
+    }
     return map;
-  }, [variants]);
+  }, [variants, products]);
+
+  // All variant IDs including synthetic ones
+  const allVariantIds = useMemo(() => {
+    const ids: string[] = [];
+    for (const pvs of Object.values(variantsByProduct)) {
+      for (const v of pvs) ids.push(v.id);
+    }
+    return ids;
+  }, [variantsByProduct]);
+
+  const initQuantities = useCallback(() => {
+    setQuantities(Object.fromEntries(allVariantIds.map((id) => [id, 0])));
+  }, [allVariantIds]);
+
+  useEffect(() => {
+    initQuantities();
+  }, [initQuantities]);
 
   const updateQuantity = (variantId: string, delta: number) => {
     setQuantities((prev) => {
       const next = Math.max(0, (prev[variantId] || 0) + delta);
-      const variant = variants.find((v) => v.id === variantId);
+      const allVars = Object.values(variantsByProduct).flat();
+      const variant = allVars.find((v) => v.id === variantId);
       if (variant && next > variant.stock) return prev;
       return { ...prev, [variantId]: next };
     });
@@ -99,7 +125,16 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
 
     initQuantities();
     setOpen(false);
+    setShowConfirmation(true);
+  };
+
+  const handleGoToCart = () => {
+    setShowConfirmation(false);
     router.push("/cart");
+  };
+
+  const handleContinueShopping = () => {
+    setShowConfirmation(false);
   };
 
   return (
@@ -146,6 +181,7 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
             {products.map((product) => {
               const productVariants = variantsByProduct[product.id] || [];
               if (productVariants.length === 0) return null;
+              const isSingleVariant = productVariants.length === 1 && productVariants[0].size === "";
 
               return (
                 <div key={product.id}>
@@ -174,54 +210,96 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
                     </div>
                   </div>
 
-                  {/* Variant options */}
-                  <div className="flex flex-col gap-2">
-                    {productVariants.map((variant) => {
-                      const qty = quantities[variant.id] || 0;
-                      const isActive = qty > 0;
-
-                      return (
-                        <div
-                          key={variant.id}
-                          className={`flex items-center rounded-full px-3 py-2 md:px-4 md:py-2.5 ${
-                            isActive
-                              ? "border-2 border-[#8793ff] bg-[#eee]"
-                              : "border border-[#c2c2c2] bg-[#eee]"
-                          }`}
-                        >
-                          <span className="text-xs md:text-sm">
-                            {variant.size}
+                  {/* Options */}
+                  {isSingleVariant ? (
+                    /* No-variant product — just quantity controls */
+                    productVariants[0].stock === 0 ? (
+                      <p className="text-xs text-red-400">품절</p>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-500">수량</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => updateQuantity(productVariants[0].id, -1)}
+                            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                            aria-label="수량 감소"
+                          >
+                            <Minus className="h-3 w-3" />
+                          </button>
+                          <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
+                            {quantities[productVariants[0].id] || 0}
                           </span>
+                          <button
+                            onClick={() => updateQuantity(productVariants[0].id, 1)}
+                            className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                            aria-label="수량 증가"
+                          >
+                            <Plus className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  ) : (
+                    /* Multiple variants — size option pills */
+                    <div className="flex flex-col gap-2">
+                      {productVariants.map((variant) => {
+                        const qty = quantities[variant.id] || 0;
+                        const isActive = qty > 0;
+                        const isSoldOut = variant.stock === 0;
 
-                          <span className="ml-auto mr-2 text-[10px] text-[#9e9e9e] md:mr-3 md:text-[11px]">
-                            재고 [{variant.stock}]
-                          </span>
-
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => updateQuantity(variant.id, -1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
-                              aria-label={`${variant.size} 수량 감소`}
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-
-                            <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
-                              {qty}
+                        return (
+                          <div
+                            key={variant.id}
+                            className={`flex items-center rounded-full px-3 py-2 md:px-4 md:py-2.5 ${
+                              isSoldOut
+                                ? "border border-[#c2c2c2] bg-[#e5e5e5] opacity-60"
+                                : isActive
+                                  ? "border-2 border-[#8793ff] bg-[#eee]"
+                                  : "border border-[#c2c2c2] bg-[#eee]"
+                            }`}
+                          >
+                            <span className="text-xs md:text-sm">
+                              {variant.size}
                             </span>
 
-                            <button
-                              onClick={() => updateQuantity(variant.id, 1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
-                              aria-label={`${variant.size} 수량 증가`}
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
+                            {isSoldOut ? (
+                              <span className="ml-auto text-[10px] text-red-400 md:text-[11px]">
+                                품절
+                              </span>
+                            ) : (
+                              <>
+                                <span className="ml-auto mr-2 text-[10px] text-[#9e9e9e] md:mr-3 md:text-[11px]">
+                                  재고 [{variant.stock}]
+                                </span>
+
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => updateQuantity(variant.id, -1)}
+                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                                    aria-label={`${variant.size} 수량 감소`}
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </button>
+
+                                  <span className="flex h-6 w-8 items-center justify-center rounded-md bg-white text-xs md:text-sm">
+                                    {qty}
+                                  </span>
+
+                                  <button
+                                    onClick={() => updateQuantity(variant.id, 1)}
+                                    className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ababab] text-white transition-opacity hover:opacity-80"
+                                    aria-label={`${variant.size} 수량 증가`}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {/* Divider between products */}
                   <div className="mt-4 h-px bg-neutral-200" />
@@ -271,6 +349,38 @@ export default function OrderModal({ products, variants }: OrderModalProps) {
           </button>
         </div>
       </div>
+
+      {/* Added to cart confirmation modal */}
+      {showConfirmation && (
+        <>
+          <div
+            className="fixed inset-0 z-60 bg-black/50"
+            onClick={handleContinueShopping}
+          />
+          <div className="fixed left-1/2 top-1/2 z-60 w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white px-5 py-6 shadow-xl">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
+                <Check className="h-5 w-5 text-white" />
+              </div>
+              <p className="text-sm">장바구니에 담겼습니다</p>
+            </div>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={handleContinueShopping}
+                className="flex-1 rounded-full border border-neutral-300 py-2.5 text-xs transition-colors hover:bg-neutral-50"
+              >
+                계속 쇼핑하기
+              </button>
+              <button
+                onClick={handleGoToCart}
+                className="flex-1 rounded-full bg-black py-2.5 text-xs text-white transition-opacity hover:opacity-80"
+              >
+                장바구니로 이동
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
