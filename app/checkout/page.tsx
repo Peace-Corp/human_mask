@@ -212,17 +212,7 @@ function PayPalPaymentSection({
   setError: (v: string | null) => void;
   disabled: boolean;
 }) {
-  const onApprove = async (data: { orderID: string }) => {
-    setIsProcessing(true);
-    try {
-      console.log("PayPal order approved:", data.orderID);
-      window.location.href = `/payment/success?orderId=${data.orderID}&amount=${amountUSD}&expectedAmount=${amountUSD}&paymentType=paypal`;
-    } catch (err) {
-      console.error("PayPal capture failed:", err);
-      setError("PayPal 결제 처리 중 오류가 발생했습니다.");
-      setIsProcessing(false);
-    }
-  };
+  const supabaseOrderIdRef = useRef<string | null>(null);
 
   const onError = (err: Record<string, unknown>) => {
     console.error("PayPal error:", err);
@@ -266,6 +256,8 @@ function PayPalPaymentSection({
             disabled={isProcessing}
             createOrder={async (_data, actions) => {
               const orderId = `order_${Date.now()}`;
+              supabaseOrderIdRef.current = orderId;
+
               await createOrder({
                 orderId,
                 cartItems,
@@ -290,9 +282,17 @@ function PayPalPaymentSection({
             }}
             onApprove={async (data, actions) => {
               if (actions.order) {
-                const details = await actions.order.capture();
-                console.log("Payment completed:", details);
-                onApprove({ orderID: data.orderID });
+                setIsProcessing(true);
+                try {
+                  const details = await actions.order.capture();
+                  console.log("Payment completed:", details);
+                  const orderId = supabaseOrderIdRef.current;
+                  window.location.href = `/payment/success?orderId=${orderId}&paymentKey=${data.orderID}&amount=${amountUSD}&expectedAmount=${amountUSD}&paymentType=paypal`;
+                } catch (err) {
+                  console.error("PayPal capture failed:", err);
+                  setError("PayPal 결제 처리 중 오류가 발생했습니다.");
+                  setIsProcessing(false);
+                }
               }
             }}
             onError={onError}
