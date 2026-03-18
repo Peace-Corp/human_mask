@@ -48,8 +48,8 @@ export async function createOrder({
   const orderItems = cartItems.map((item) => ({
     order_id: orderId,
     product_id: item.productId,
-    variant_id: item.variantId,
-    size: item.size,
+    variant_id: item.variantId === item.productId ? null : item.variantId,
+    size: item.size || null,
     quantity: item.quantity,
     price_at_time: item.price,
   }));
@@ -77,6 +77,16 @@ export async function finalizeOrder(
     .eq("id", orderId);
 
   if (error) throw error;
+
+  // Decrement stock for all items in the order
+  const { error: stockError } = await supabase.rpc(
+    "decrement_stock_for_order",
+    { p_order_id: orderId }
+  );
+
+  if (stockError) {
+    console.error("Failed to decrement stock:", stockError);
+  }
 }
 
 export interface OrderWithItems {
