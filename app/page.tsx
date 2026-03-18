@@ -23,7 +23,7 @@ export default async function Home() {
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col">
         <main className="flex flex-1 flex-col">
           {/* Product Lineup */}
-          <ProductCarousel products={products} />
+          <ProductCarousel products={products} variants={variants} />
 
           {/* Product Banner */}
           {orderDetailImage && <ProductBannerSection imageUrl={orderDetailImage} />}

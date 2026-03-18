@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import gsap from "gsap";
 import { formatPrice } from "@/utils/formatPrice";
@@ -8,11 +7,12 @@ interface ProductCardProps {
   name: string;
   price: number;
   image: string | null;
+  onClick?: () => void;
 }
 
-export default function ProductCard({ id, name, price, image }: ProductCardProps) {
+export default function ProductCard({ id, name, price, image, onClick }: ProductCardProps) {
   return (
-    <div>
+    <div onClick={onClick} className="cursor-pointer" role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick?.(); }}>
       <div
         className="relative w-full overflow-hidden rounded bg-gray-100"
         style={{ aspectRatio: "0.7 / 1" }}
