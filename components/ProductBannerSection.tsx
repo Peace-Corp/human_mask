@@ -25,6 +25,7 @@ export default function ProductBannerSection({
               alt={`Detail image ${i + 1}`}
               width={960}
               height={540}
+              unoptimized
               className="h-auto w-full rounded-lg object-contain"
             />
           </div>
@@ -45,6 +46,7 @@ export default function ProductBannerSection({
                     alt={`Detail image ${i + 1}-${j + 1}`}
                     width={960}
                     height={540}
+                    unoptimized
                     className="h-auto w-full object-contain"
                   />
                 </SwiperSlide>

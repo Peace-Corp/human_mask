@@ -10,7 +10,7 @@ import {
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { getCart, getCartTotal } from "@/utils/cart";
 import { formatPrice } from "@/utils/formatPrice";
-import { createOrder } from "@/lib/orders";
+import { createOrder, validateStock } from "@/lib/orders";
 import ShippingForm from "@/components/checkout/ShippingForm";
 import type { CartItem, ShippingInfo } from "@/lib/types";
 
@@ -119,6 +119,14 @@ function TossPaymentSection({
 
     setIsProcessing(true);
     try {
+      // Validate stock before proceeding
+      const stockCheck = await validateStock(cartItems);
+      if (!stockCheck.valid) {
+        setError(stockCheck.message || "재고가 부족합니다.");
+        setIsProcessing(false);
+        return;
+      }
+
       // Ensure widget amount matches current total before payment
       await widgets.setAmount({ currency: "KRW", value: amount });
 
@@ -217,10 +225,15 @@ function PayPalPaymentSection({
   const onError = (err: Record<string, unknown>) => {
     console.error("PayPal error:", err);
     setError("PayPal 결제 중 오류가 발생했습니다.");
+    setIsProcessing(false);
   };
 
   const onCancel = () => {
-    console.log("PayPal payment cancelled");
+    // Order was created in Supabase but payment cancelled — it stays as "pending"
+    // and will not be finalized (no stock decrement). Reset ref so next attempt
+    // creates a fresh order.
+    supabaseOrderIdRef.current = null;
+    setIsProcessing(false);
   };
 
   return (
@@ -255,6 +268,13 @@ function PayPalPaymentSection({
             }}
             disabled={isProcessing}
             createOrder={async (_data, actions) => {
+              // Validate stock before proceeding
+              const stockCheck = await validateStock(cartItems);
+              if (!stockCheck.valid) {
+                setError(stockCheck.message || "재고가 부족합니다.");
+                throw new Error(stockCheck.message);
+              }
+
               const orderId = `order_${Date.now()}`;
               supabaseOrderIdRef.current = orderId;
 

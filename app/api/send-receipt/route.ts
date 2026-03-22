@@ -122,6 +122,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function formatPrice(amount: number) {
   return `₩ ${amount.toLocaleString()}원`;
 }
@@ -149,10 +157,10 @@ function buildReceiptHtml({
       (item: any) => `
       <tr>
         <td style="padding:8px 0;font-size:13px;color:#111827;border-bottom:1px solid #f3f4f6;">
-          ${item.product?.name || "상품"}
+          ${escapeHtml(item.product?.name || "상품")}
           <br/>
           <span style="font-size:11px;color:#9ca3af;">
-            ${item.size ? `${item.size} · ` : ""}수량 ${item.quantity}개
+            ${item.size ? `${escapeHtml(item.size)} · ` : ""}수량 ${item.quantity}개
           </span>
         </td>
         <td style="padding:8px 0;font-size:13px;color:#111827;text-align:right;white-space:nowrap;border-bottom:1px solid #f3f4f6;font-weight:500;">
@@ -187,7 +195,7 @@ function buildReceiptHtml({
               <!-- Order ID + Date -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px dashed #d1d5db;">
                 <tr>
-                  <td style="font-size:11px;color:#9ca3af;">주문번호<br/><span style="font-size:12px;color:#111827;font-family:monospace;">${order.id}</span></td>
+                  <td style="font-size:11px;color:#9ca3af;">주문번호<br/><span style="font-size:12px;color:#111827;font-family:monospace;">${escapeHtml(order.id)}</span></td>
                   <td style="font-size:11px;color:#9ca3af;text-align:right;">주문일시<br/><span style="font-size:12px;color:#374151;">${orderDate}</span></td>
                 </tr>
               </table>
@@ -223,8 +231,8 @@ function buildReceiptHtml({
                 ${
                   order.customer_name || order.customer_email
                     ? `<tr>
-                  ${order.customer_name ? `<td style="font-size:11px;color:#9ca3af;padding:4px 0;">수령인<br/><span style="font-size:12px;color:#374151;">${order.customer_name}</span></td>` : "<td></td>"}
-                  ${order.customer_email ? `<td style="font-size:11px;color:#9ca3af;padding:4px 0;">이메일<br/><span style="font-size:12px;color:#374151;">${order.customer_email}</span></td>` : "<td></td>"}
+                  ${order.customer_name ? `<td style="font-size:11px;color:#9ca3af;padding:4px 0;">수령인<br/><span style="font-size:12px;color:#374151;">${escapeHtml(order.customer_name)}</span></td>` : "<td></td>"}
+                  ${order.customer_email ? `<td style="font-size:11px;color:#9ca3af;padding:4px 0;">이메일<br/><span style="font-size:12px;color:#374151;">${escapeHtml(order.customer_email)}</span></td>` : "<td></td>"}
                 </tr>`
                     : ""
                 }

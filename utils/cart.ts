@@ -16,7 +16,7 @@ export function getCart(): CartItem[] {
   }
 }
 
-function saveCart(cart: CartItem[]): void {
+export function saveCart(cart: CartItem[]): void {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
   dispatchCartChange();
 }

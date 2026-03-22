@@ -1,6 +1,61 @@
 import { supabase } from "./supabase";
 import type { CartItem, ShippingInfo } from "./types";
 
+export async function validateStock(
+  cartItems: CartItem[]
+): Promise<{ valid: boolean; message?: string }> {
+  const variantIds = cartItems
+    .filter((item) => item.variantId !== item.productId)
+    .map((item) => item.variantId);
+
+  const productOnlyItems = cartItems.filter(
+    (item) => item.variantId === item.productId
+  );
+
+  // Check variant stock
+  if (variantIds.length > 0) {
+    const { data: variants } = await supabase
+      .from("product_variants")
+      .select("id, stock")
+      .in("id", variantIds);
+
+    for (const item of cartItems) {
+      if (item.variantId === item.productId) continue;
+      const variant = variants?.find((v) => v.id === item.variantId);
+      if (!variant) return { valid: false, message: `"${item.productName} (${item.size})" 옵션을 찾을 수 없습니다.` };
+      if (variant.stock < item.quantity) {
+        return {
+          valid: false,
+          message: variant.stock === 0
+            ? `"${item.productName} (${item.size})"이(가) 품절되었습니다.`
+            : `"${item.productName} (${item.size})" 재고가 ${variant.stock}개 남았습니다.`,
+        };
+      }
+    }
+  }
+
+  // Check product-level stock for no-variant items
+  for (const item of productOnlyItems) {
+    const { data: product } = await supabase
+      .from("products")
+      .select("stock")
+      .eq("id", item.productId)
+      .single();
+
+    if (!product) return { valid: false, message: `"${item.productName}" 상품을 찾을 수 없습니다.` };
+    if (product.stock < item.quantity) {
+      return {
+        valid: false,
+        message: product.stock === 0
+          ? `"${item.productName}"이(가) 품절되었습니다.`
+          : `"${item.productName}" 재고가 ${product.stock}개 남았습니다.`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+
 export async function createOrder({
   orderId,
   cartItems,
@@ -67,16 +122,24 @@ export async function finalizeOrder(
   orderId: string,
   paymentId: string | null
 ) {
-  const { error } = await supabase
+  // Only finalize orders that are still pending — prevents double finalization
+  // on page refresh or duplicate calls
+  const { data: updated, error } = await supabase
     .from("orders")
     .update({
       payment_status: "completed",
       payment_id: paymentId,
       status: "processing",
     })
-    .eq("id", orderId);
+    .eq("id", orderId)
+    .eq("payment_status", "pending")
+    .select("id")
+    .maybeSingle();
 
   if (error) throw error;
+
+  // If no row was updated, the order was already finalized — skip stock decrement
+  if (!updated) return;
 
   // Decrement stock for all items in the order
   const { error: stockError } = await supabase.rpc(

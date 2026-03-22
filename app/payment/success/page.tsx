@@ -23,23 +23,56 @@ function PaymentSuccessContent() {
   const expectedAmount = searchParams.get("expectedAmount");
   const paymentType = searchParams.get("paymentType");
   const isPayPal = paymentType === "paypal";
-  const isValid = isPayPal
+  const hasRequiredParams = isPayPal
     ? !!orderId
-    : amount && expectedAmount
-      ? Number(amount) === Number(expectedAmount)
-      : false;
+    : !!(orderId && paymentKey && amount && expectedAmount);
 
   useEffect(() => {
-    if (isValid && orderId) {
+    if (hasRequiredParams && orderId) {
       confirmPayment();
     } else {
       setIsConfirming(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const confirmPayment = async () => {
     setIsConfirming(true);
     try {
+      // For Toss payments, confirm server-side before finalizing
+      if (!isPayPal) {
+        const confirmRes = await fetch("/api/confirm-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentKey,
+            orderId,
+            amount: Number(amount),
+          }),
+        });
+
+        if (!confirmRes.ok) {
+          const err = await confirmRes.json();
+          setConfirmResult({
+            success: false,
+            message: err.error || "결제 확인에 실패했습니다.",
+          });
+          setIsConfirming(false);
+          return;
+        }
+
+        // Verify the confirmed amount matches expected
+        const confirmed = await confirmRes.json();
+        if (confirmed.totalAmount !== Number(expectedAmount)) {
+          setConfirmResult({
+            success: false,
+            message: "결제 금액이 일치하지 않습니다.",
+          });
+          setIsConfirming(false);
+          return;
+        }
+      }
+
       await finalizeOrder(orderId!, paymentKey || null);
       clearCart();
 
@@ -67,7 +100,7 @@ function PaymentSuccessContent() {
     }
   };
 
-  if (!isValid) {
+  if (!hasRequiredParams) {
     return (
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
         <div className="w-14 h-14 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
