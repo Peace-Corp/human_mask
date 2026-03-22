@@ -7,6 +7,7 @@ import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { formatPrice } from "@/utils/formatPrice";
 import {
   getCart,
+  saveCart,
   updateCartItemQuantity,
   removeFromCart,
   clearCart,
@@ -96,8 +97,7 @@ export default function CartPage() {
         .filter((item) => item.quantity > 0);
 
       // Persist adjusted cart
-      localStorage.setItem("human_mask_cart", JSON.stringify(adjusted));
-      window.dispatchEvent(new Event("cart-change"));
+      saveCart(adjusted);
 
       setCartItems(adjusted);
       setStockMap(stock);
