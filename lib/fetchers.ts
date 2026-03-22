@@ -72,15 +72,27 @@ export async function getAllProductVariants(
 
 // --- Brand ---
 
-export async function getBrandOrderDetailImage(): Promise<string | null> {
+export async function getBrandOrderDetailImages(): Promise<
+  (string | string[])[]
+> {
   const { data, error } = await supabase
     .from("brands")
     .select("order_detail_image")
     .eq("id", BRAND_ID)
     .single();
 
-  if (error) return null;
-  return data?.order_detail_image ?? null;
+  if (error) return [];
+
+  const raw = data?.order_detail_image;
+  if (!raw) return [];
+
+  // Backward compat: if it's a plain string, wrap it
+  if (typeof raw === "string") return [raw];
+
+  // Should be a jsonb array of (string | string[])
+  if (Array.isArray(raw)) return raw as (string | string[])[];
+
+  return [];
 }
 
 // --- Hero Banners ---
